@@ -1,6 +1,6 @@
 # 🌐 DV Social
 
-DV Social es una red social simple para la materia *Clientes Web Mobile*. Permite a los usuarios registrarse, publicar posts, comentar publicaciones, editar su perfil y participar en un chat global en tiempo real.
+Social Media es una red social simple para la materia *Clientes Web Mobile*. Permite a los usuarios registrarse, publicar posts, comentar publicaciones, editar su perfil y participar en un chat global en tiempo real.
 
 ---
 
@@ -17,7 +17,7 @@ DV Social es una red social simple para la materia *Clientes Web Mobile*. Permit
 ✅ Registro y autenticación de usuarios  
 ✅ Creación y visualización de publicaciones  
 ✅ Comentarios en publicaciones con actualizaciones en tiempo real  
-✅ Edición de perfil (nombre, bio, carrera)  
+✅ Edición de perfil (nombre, bio, carrera, avatar, contraseña)  
 ✅ Visualización de perfiles de otros usuarios  
 ✅ Eliminación de publicaciones y comentarios propios  
 ✅ Chat global en tiempo real  
@@ -29,7 +29,7 @@ DV Social es una red social simple para la materia *Clientes Web Mobile*. Permit
 
 1. **Clonar el repositorio**
 ```bash
-git clone https://github.com/M4ttux/clientes_web_chat.git
+git clone https://github.com/M4ttux/clientes-web-parcial01.git
 cd dv-social
 ```
 
@@ -61,7 +61,7 @@ npm run dev
 
 ## 📄 Autores y Datos Académicos
 
-**Autores:** Matias Jose Neto | Matias Martinez
+**Autores:** Matias Jose Neto | Matias Martinez  
 **Carrera:** Diseño y Programacion Web  
 **Materia:** Clientes Web Mobile  
 **Comisión:** DWT4AV  
