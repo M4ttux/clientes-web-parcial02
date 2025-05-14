@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 html {
-  overflow-y: scroll;         /* scrollbar visible siempre */
-  overflow-x: hidden;     /* evitamos barras blancas laterales */
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 input::file-selector-button {

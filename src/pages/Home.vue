@@ -1,116 +1,142 @@
 <script>
-import { onMounted, ref } from 'vue'
-import MainH1 from '../components/MainH1.vue'
-import PostCard from '../components/PostCard.vue'
-import MainLoader from '../components/MainLoader.vue'
-import supabase from '../services/supabase'
-import {
-  getAllPosts,
-  createPost,
-  subscribeToNewComments,
-  subscribeToNewPosts
-} from '../services/posts'
+  // Importaciones de Vue y componentes
+  import { onMounted, ref } from 'vue'
+  import MainH1 from '../components/MainH1.vue'
+  import PostCard from '../components/PostCard.vue'
+  import MainLoader from '../components/MainLoader.vue'
 
-export default {
-  components: {
-    MainH1,
-    PostCard,
-    MainLoader
-  },
-  setup() {
-    const posts = ref([])
-    const loading = ref(true)
-    const newPost = ref('')
-    const user = ref(null)
-    const posting = ref(false)
+  // Supabase y servicios relacionados a publicaciones
+  import supabase from '../services/supabase'
+  import {
+    getAllPosts,
+    createPost,
+    subscribeToNewComments,
+    subscribeToNewPosts
+  } from '../services/posts'
 
-    const fetchPosts = async () => {
-      try {
-        posts.value = await getAllPosts()
-      } catch (err) {
-        console.error('Error al cargar publicaciones:', err)
-      }
-    }
+  export default {
+    components: {
+      MainH1,
+      PostCard,
+      MainLoader
+    },
 
-    const handleCreatePost = async () => {
-      if (!newPost.value.trim()) return
-      posting.value = true
+    setup() {
+      // Variables reactivas
+      const posts = ref([]) // Lista de publicaciones
+      const loading = ref(true) // Estado de carga
+      const newPost = ref('') // Contenido del nuevo post
+      const user = ref(null) // Usuario autenticado
+      const posting = ref(false) // Estado de publicación
 
-      const {
-        data: { user: currentUser }
-      } = await supabase.auth.getUser()
-
-      try {
-        const post = await createPost(newPost.value, currentUser.id)
-        posts.value.unshift(post)
-        newPost.value = ''
-      } catch (err) {
-        console.error('Error al crear publicación:', err)
+      /**
+       * Trae las publicaciones desde Supabase.
+       */
+      const fetchPosts = async () => {
+        try {
+          posts.value = await getAllPosts()
+        } catch (err) {
+          console.error('Error al cargar publicaciones:', err)
+        }
       }
 
-      posting.value = false
-    }
+      /**
+       * Crea una nueva publicación y la agrega a la lista.
+       */
+      const handleCreatePost = async () => {
+        if (!newPost.value.trim()) return
+        posting.value = true
 
-    onMounted(async () => {
-      const {
-        data: { user: currentUser }
-      } = await supabase.auth.getUser()
-      user.value = currentUser
+        // Trae el usuario autenticado
+        const {
+          data: { user: currentUser }
+        } = await supabase.auth.getUser()
 
-      await fetchPosts()
-      loading.value = false
+        try {
+          const post = await createPost(newPost.value, currentUser.id)
+          posts.value.unshift(post) // Insertamos arriba del feed
+          newPost.value = ''
+        } catch (err) {
+          console.error('Error al crear publicación:', err)
+        }
 
-      // Comentarios en tiempo real
-      subscribeToNewComments(async ({ new: newComment }) => {
-        const post = posts.value.find(p => p.id === newComment.post_id)
-        if (post) {
-          const alreadyExists = post.comments?.some(c => c.id === newComment.id)
-          if (alreadyExists) return
+        posting.value = false
+      }
+
+      /**
+       * Lógica que se ejecuta al montar el componente.
+       * Incluye: obtener usuario, publicaciones y suscribirse a eventos en tiempo real.
+       */
+      onMounted(async () => {
+        // Usuario autenticado
+        const {
+          data: { user: currentUser }
+        } = await supabase.auth.getUser()
+        user.value = currentUser
+
+        // Cargar publicaciones iniciales
+        await fetchPosts()
+        loading.value = false
+
+        /**
+         * Suscribirse a nuevos comentarios en tiempo real.
+         * Si ya existe el comentario (por un insert duplicado), no se agrega.
+         */
+        subscribeToNewComments(async ({ new: newComment }) => {
+          const post = posts.value.find(p => p.id === newComment.post_id)
+          if (post) {
+            const alreadyExists = post.comments?.some(c => c.id === newComment.id)
+            if (alreadyExists) return
+
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('id, display_name')
+              .eq('id', newComment.user_profile_id)
+              .single()
+
+            if (!post.comments) post.comments = []
+
+            post.comments.push({
+              ...newComment,
+              user_profiles: profile || { display_name: 'Usuario' }
+            })
+          }
+        })
+
+        /**
+         * Suscribirse a nuevos posts en tiempo real.
+         * Evita duplicados si ya están en el feed.
+         */
+        subscribeToNewPosts(async ({ new: newPostData }) => {
+          if (posts.value.some(p => p.id === newPostData.id)) return
 
           const { data: profile } = await supabase
             .from('user_profiles')
             .select('id, display_name')
-            .eq('id', newComment.user_profile_id)
+            .eq('id', newPostData.user_profile_id)
             .single()
 
-          if (!post.comments) post.comments = []
-          post.comments.push({
-            ...newComment,
-            user_profiles: profile || { display_name: 'Usuario' }
+          posts.value.unshift({
+            ...newPostData,
+            user_profiles: profile || { display_name: 'Usuario' },
+            comments: []
           })
-        }
-      })
-
-
-      // Nuevos posts en tiempo real
-      subscribeToNewPosts(async ({ new: newPostData }) => {
-        if (posts.value.some(p => p.id === newPostData.id)) return
-
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('id, display_name')
-          .eq('id', newPostData.user_profile_id)
-          .single()
-
-        posts.value.unshift({
-          ...newPostData,
-          user_profiles: profile || { display_name: 'Usuario' },
-          comments: []
         })
       })
-    })
 
-    return {
-      posts,
-      loading,
-      newPost,
-      user,
-      posting,
-      handleCreatePost
+      // Retornamos las variables y funciones al template
+      return {
+        posts,
+        loading,
+        newPost,
+        user,
+        posting,
+        handleCreatePost
+      }
     }
   }
-}
 </script>
+
 
 <template>
   <div class="flex justify-center">

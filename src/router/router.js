@@ -1,5 +1,5 @@
 /*
-Archivo del router de nuestra aplicación.
+  Archivo del router de nuestra aplicación.
 */
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../pages/Home.vue";
@@ -53,7 +53,7 @@ const router = createRouter({
   routes
 });
 
-// ✅ Middleware de navegación para proteger rutas
+// Middleware de navegación para proteger rutas
 router.beforeEach(async (to, from) => {
   if (to.meta.requiresAuth) {
     const { data: { session } } = await supabase.auth.getSession();

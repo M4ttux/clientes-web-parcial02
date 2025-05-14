@@ -2,10 +2,14 @@
 import supabase from '../services/supabase'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+// Componentes reutilizables
 import MainH1 from '../components/MainH1.vue'
 import PostCard from '../components/PostCard.vue'
 import MainLoader from '../components/MainLoader.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
+
+// Servicios relacionados al perfil del usuario
 import {
   getUserProfileByPK,
   getPostsByUser,
@@ -14,7 +18,6 @@ import {
   deleteCommentById
 } from '../services/user-profile'
 
-
 export default {
   components: {
     MainH1,
@@ -22,20 +25,23 @@ export default {
     MainLoader,
     ConfirmModal
   },
+
   setup() {
     const router = useRouter()
+
+    // Refs reactivos
     const profile = ref(null)
     const posts = ref([])
     const comments = ref([])
     const loading = ref(true)
 
-
+    // Modal de confirmación
     const showModal = ref(false)
     const modalTitle = ref('')
     const modalMessage = ref('')
     const confirmAction = ref(null)
 
-
+    // Abre el modal con parámetros personalizados
     const openModal = (title, message, action) => {
       modalTitle.value = title
       modalMessage.value = message
@@ -43,19 +49,19 @@ export default {
       showModal.value = true
     }
 
-
+    // Cierra el modal
     const closeModal = () => {
       showModal.value = false
       confirmAction.value = null
     }
 
-
+    // Ejecuta la acción confirmada y cierra el modal
     const confirmModal = async () => {
       if (confirmAction.value) await confirmAction.value()
       closeModal()
     }
 
-
+    // Lógica para eliminar una publicación
     const deletePost = (id) => {
       openModal(
         'Eliminar publicación',
@@ -71,7 +77,7 @@ export default {
       )
     }
 
-
+    // Lógica para eliminar un comentario
     const deleteComment = (id) => {
       openModal(
         'Eliminar comentario',
@@ -87,42 +93,41 @@ export default {
       )
     }
 
-
+    // Redirección a la vista de edición del perfil
     const goToEdit = () => {
       router.push({ name: 'MyProfileEdit' })
     }
 
-
+    // Canal para recibir comentarios en tiempo real
     let canalComentarios = null
 
-
+    // Carga del perfil, posts y comentarios al montar el componente
     onMounted(async () => {
       try {
+        // Obtenemos sesión actual
         const {
           data: { session },
           error: sessionError
         } = await supabase.auth.getSession()
 
-
         const user = session?.user
 
-
+        // Si no hay usuario autenticado
         if (!user || sessionError || !user.id) {
           console.warn('No hay usuario autenticado')
           loading.value = false
           return
         }
 
-
+        // Cargar perfil, publicaciones y comentarios del usuario
         const profileData = await getUserProfileByPK(user.id)
         profile.value = profileData
-
 
         const userProfileId = profileData.id
         posts.value = await getPostsByUser(userProfileId)
         comments.value = await getCommentsByUser(userProfileId)
 
-
+        // Suscripción a nuevos comentarios del usuario
         canalComentarios = supabase
           .channel('comentarios-usuario')
           .on(
@@ -145,14 +150,14 @@ export default {
       }
     })
 
-
+    // Al desmontar el componente, se limpia el canal
     onUnmounted(() => {
       if (canalComentarios) {
         supabase.removeChannel(canalComentarios)
       }
     })
 
-
+    // Variables y métodos expuestos al template
     return {
       profile,
       posts,
@@ -170,7 +175,6 @@ export default {
   }
 }
 </script>
-
 
 <template>
   <div class="w-full max-w-4xl mx-auto p-4">

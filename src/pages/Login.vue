@@ -1,30 +1,41 @@
 <script>
-import MainH1 from "../components/MainH1.vue";
-import { login } from "../services/auth";
+  // Importamos el componente de título principal y la función de login
+  import MainH1 from "../components/MainH1.vue";
+  import { login } from "../services/auth";
 
-export default {
-  name: "Login",
-  components: { MainH1 },
-  data() {
-    return {
-      user: {
-        email: "",
-        password: "",
+  export default {
+    name: "Login",
+    components: { MainH1 },
+
+    data() {
+      return {
+        // Datos del formulario de inicio de sesión
+        user: {
+          email: "",
+          password: "",
+        }
+      }
+    },
+
+    methods: {
+      /**
+       * Maneja el envío del formulario de login.
+       * Llama a la función de login del servicio de autenticación y redirige a Home si tiene éxito.
+       */
+      async handleSubmit() {
+        try {
+          const user = await login(this.user.email, this.user.password);
+          // Si el login es exitoso, redirige al home
+          this.$router.push({ name: "home" });
+        } catch (error) {
+          // Si ocurre un error, lo mostramos en consola
+          console.error("[Login.vue handleSubmit] Error al loguear el usuario: ", error);
+        }
       }
     }
-  },
-  methods: {
-    async handleSubmit() {
-      try {
-        const user = await login(this.user.email, this.user.password);
-        this.$router.push({ name: "home" });
-      } catch (error) {
-        console.error("[Login.vue handleSubmit] Error al loguear el usuario: ", error);
-      }
-    }
-  }
-};
+  };
 </script>
+
 
 <template>
   <div class="bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">

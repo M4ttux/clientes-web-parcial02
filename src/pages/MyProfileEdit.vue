@@ -1,115 +1,133 @@
 <script>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import MainH1 from "../components/MainH1.vue";
-import MainLoader from "../components/MainLoader.vue";
+import { ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
+import MainH1 from "../components/MainH1.vue"
+import MainLoader from "../components/MainLoader.vue"
+
+// Funciones de servicio relacionadas con perfiles y autenticación
 import {
   getUserProfileByPK,
   updateUserProfile,
-} from "../services/user-profile";
-import supabase from "../services/supabase";
-import { cambiarPassword } from "../services/auth";
+} from "../services/user-profile"
+import supabase from "../services/supabase"
+import { cambiarPassword } from "../services/auth"
 
 export default {
   components: {
     MainH1,
     MainLoader,
   },
+
   setup() {
-    const router = useRouter();
-    const profile = ref(null);
-    const loading = ref(true);
-    const saving = ref(false);
-    const errorMsg = ref("");
-    const nuevaPassword = ref("");
+    const router = useRouter()
 
-    const display_name = ref("");
-    const bio = ref("");
-    const career = ref("");
+    // Refs reactivas para estado de perfil, loading y errores
+    const profile = ref(null)
+    const loading = ref(true)
+    const saving = ref(false)
+    const errorMsg = ref("")
+    const nuevaPassword = ref("")
 
+    // Campos editables del formulario
+    const display_name = ref("")
+    const bio = ref("")
+    const career = ref("")
+
+    // Al montar el componente, obtener la sesión y cargar perfil
     onMounted(async () => {
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } = await supabase.auth.getSession()
 
-      const user = session?.user;
+      const user = session?.user
 
+      // Si no hay sesión, redirigir a login
       if (!user) {
-        router.push({ name: "Login" });
-        return;
+        router.push({ name: "Login" })
+        return
       }
 
       try {
-        const profileData = await getUserProfileByPK(user.id);
-        profile.value = profileData;
-        display_name.value = profileData.display_name || "";
-        bio.value = profileData.bio || "";
-        career.value = profileData.career || "";
+        // Cargar los datos actuales del perfil
+        const profileData = await getUserProfileByPK(user.id)
+        profile.value = profileData
+        display_name.value = profileData.display_name || ""
+        bio.value = profileData.bio || ""
+        career.value = profileData.career || ""
       } catch (err) {
-        console.error("Error al traer perfil:", err);
-        errorMsg.value = "No se pudo cargar el perfil.";
+        console.error("Error al traer perfil:", err)
+        errorMsg.value = "No se pudo cargar el perfil."
       }
 
-      loading.value = false;
-    });
+      loading.value = false
+    })
 
+    // Guardar cambios del perfil
     const updateProfile = async () => {
-      errorMsg.value = "";
+      errorMsg.value = ""
+
+      // Validación de nombre obligatorio
       if (!display_name.value.trim()) {
-        errorMsg.value = "El nombre es obligatorio.";
-        return;
+        errorMsg.value = "El nombre es obligatorio."
+        return
       }
 
-      saving.value = true;
+      saving.value = true
 
       try {
+        // Actualizar campos del perfil
         await updateUserProfile(profile.value.id, {
           display_name: display_name.value,
           bio: bio.value,
           career: career.value,
-        });
+        })
 
-        // Cambiar contraseña si se ingresó una nueva
+        // Si se ingresó nueva contraseña, validarla y actualizarla
         if (nuevaPassword.value.trim() !== "") {
           if (nuevaPassword.value.length < 6) {
-            errorMsg.value = "La contraseña debe tener al menos 6 caracteres.";
-            saving.value = false;
-            return;
+            errorMsg.value = "La contraseña debe tener al menos 6 caracteres."
+            saving.value = false
+            return
           }
-          await cambiarPassword(nuevaPassword.value);
+
+          await cambiarPassword(nuevaPassword.value)
         }
 
-        router.push({ name: "MyProfile" });
+        // Redirigir al perfil al guardar
+        router.push({ name: "MyProfile" })
       } catch (err) {
-        console.error("Error al actualizar perfil:", err);
-        errorMsg.value = "Hubo un error al guardar los cambios.";
+        console.error("Error al actualizar perfil:", err)
+        errorMsg.value = "Hubo un error al guardar los cambios."
       } finally {
-        saving.value = false;
+        saving.value = false
       }
-    };
+    }
 
+    // Subir y actualizar avatar de perfil
     const subirAvatar = async (e) => {
-      const archivo = e.target.files[0];
-      if (!archivo) return;
+      const archivo = e.target.files[0]
+      if (!archivo) return
 
-      const nombreArchivo = `${profile.value.id}_${Date.now()}`;
+      // Generar nombre único basado en ID y timestamp
+      const nombreArchivo = `${profile.value.id}_${Date.now()}`
 
       const { error } = await supabase.storage
         .from("avatars")
-        .upload(nombreArchivo, archivo);
+        .upload(nombreArchivo, archivo)
 
       if (error) {
-        errorMsg.value = "No se pudo subir la imagen.";
-        return;
+        errorMsg.value = "No se pudo subir la imagen."
+        return
       }
 
+      // Obtener URL pública y actualizar en el perfil
       const publicUrl = supabase.storage
         .from("avatars")
-        .getPublicUrl(nombreArchivo).data.publicUrl;
+        .getPublicUrl(nombreArchivo).data.publicUrl
 
-      await updateUserProfile(profile.value.id, { avatar_url: publicUrl });
-      profile.value.avatar_url = publicUrl;
-    };
+      await updateUserProfile(profile.value.id, { avatar_url: publicUrl })
+      profile.value.avatar_url = publicUrl
+    }
 
     return {
       display_name,
@@ -122,10 +140,11 @@ export default {
       errorMsg,
       subirAvatar,
       profile,
-    };
+    }
   },
-};
+}
 </script>
+
 
 <template>
   <div class="w-full max-w-xl mx-auto p-4">
