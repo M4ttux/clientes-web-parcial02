@@ -57,8 +57,7 @@ export default {
         <!-- Imagen de perfil -->
         <div class="flex justify-center mb-4">
           <img
-            v-if="profile.avatar_url"
-            :src="profile.avatar_url"
+            :src="profile.avatar_url ? profile.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.display_name)}&background=4b5563&color=ffffff`"
             alt="Foto de perfil"
             class="w-24 h-24 rounded-full border border-gray-600"
           />

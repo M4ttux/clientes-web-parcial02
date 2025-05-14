@@ -14,6 +14,7 @@ import {
   deleteCommentById
 } from '../services/user-profile'
 
+
 export default {
   components: {
     MainH1,
@@ -28,10 +29,12 @@ export default {
     const comments = ref([])
     const loading = ref(true)
 
+
     const showModal = ref(false)
     const modalTitle = ref('')
     const modalMessage = ref('')
     const confirmAction = ref(null)
+
 
     const openModal = (title, message, action) => {
       modalTitle.value = title
@@ -40,15 +43,18 @@ export default {
       showModal.value = true
     }
 
+
     const closeModal = () => {
       showModal.value = false
       confirmAction.value = null
     }
 
+
     const confirmModal = async () => {
       if (confirmAction.value) await confirmAction.value()
       closeModal()
     }
+
 
     const deletePost = (id) => {
       openModal(
@@ -65,6 +71,7 @@ export default {
       )
     }
 
+
     const deleteComment = (id) => {
       openModal(
         'Eliminar comentario',
@@ -80,11 +87,14 @@ export default {
       )
     }
 
+
     const goToEdit = () => {
       router.push({ name: 'MyProfileEdit' })
     }
 
+
     let canalComentarios = null
+
 
     onMounted(async () => {
       try {
@@ -93,7 +103,9 @@ export default {
           error: sessionError
         } = await supabase.auth.getSession()
 
+
         const user = session?.user
+
 
         if (!user || sessionError || !user.id) {
           console.warn('No hay usuario autenticado')
@@ -101,14 +113,16 @@ export default {
           return
         }
 
+
         const profileData = await getUserProfileByPK(user.id)
         profile.value = profileData
+
 
         const userProfileId = profileData.id
         posts.value = await getPostsByUser(userProfileId)
         comments.value = await getCommentsByUser(userProfileId)
 
-        // ✅ SUSCRIPCIÓN A COMENTARIOS NUEVOS
+
         canalComentarios = supabase
           .channel('comentarios-usuario')
           .on(
@@ -131,11 +145,13 @@ export default {
       }
     })
 
+
     onUnmounted(() => {
       if (canalComentarios) {
         supabase.removeChannel(canalComentarios)
       }
     })
+
 
     return {
       profile,
@@ -155,6 +171,7 @@ export default {
 }
 </script>
 
+
 <template>
   <div class="w-full max-w-4xl mx-auto p-4">
     <div class="flex justify-between items-center mb-4">
@@ -164,18 +181,18 @@ export default {
       </button>
     </div>
 
+
     <MainLoader v-if="loading" class="mx-auto" />
+
 
     <div v-else>
       <div v-if="profile">
         <!-- Datos del perfil -->
         <div class="bg-gray-800 text-white rounded-xl p-4 shadow mb-6 text-center">
-          <div v-if="profile.avatar_url" class="flex justify-center mb-4">
+          <div class="flex justify-center mb-4">
             <img
-              :src="profile.avatar_url || 'https://ui-avatars.com/api/?name=${encodeURIComponent(profile.display_name)}&background=4b5563&color=ffffff'"
-              alt="Avatar"
-              class="w-24 h-24 rounded-full border border-gray-600"
-            />
+              :src="profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.display_name)}&background=4b5563&color=ffffff`"
+              alt="Avatar" class="w-24 h-24 rounded-full border border-gray-600" />
           </div>
           <h2 class="text-2xl font-bold mb-1">{{ profile.display_name }}</h2>
           <p class="text-sm text-gray-400 mb-2">
@@ -185,6 +202,7 @@ export default {
           <p><strong>Carrera:</strong> {{ profile.career || 'No especificada' }}</p>
         </div>
 
+
         <!-- Publicaciones -->
         <div>
           <h3 class="text-xl text-white font-semibold mb-3">Mis Publicaciones</h3>
@@ -192,28 +210,39 @@ export default {
           <p v-if="posts.length === 0" class="text-gray-400">Todavía no publicaste nada.</p>
         </div>
 
+
         <!-- Comentarios -->
         <div class="mt-8">
           <h3 class="text-xl text-white font-semibold mb-3">Mis Comentarios</h3>
           <div v-for="comment in comments" :key="comment.id" class="bg-gray-700 text-white p-3 rounded-lg mb-3">
-            <div class="flex justify-between items-center mb-1">
-              <p class="text-sm text-gray-400">
-                Comentado el {{ new Date(comment.created_at).toLocaleString('es-AR') }}
-              </p>
+            <div class="flex items-center gap-3 mb-1">
+              <img
+                :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name || '')}&background=4b5563&color=ffffff`"
+                alt="avatar" class="w-8 h-8 rounded-full border border-gray-500" />
+              <span class="font-semibold text-blue-300 text-sm">
+                {{ comment.user_profiles?.display_name || 'Anónimo' }}
+              </span>
+              <span class="ml-auto text-xs text-gray-400">
+                {{ new Date(comment.created_at).toLocaleString('es-AR') }}
+              </span>
+            </div>
+            <p class="text-gray-200">{{ comment.content }}</p>
+            <div class="text-right mt-1">
               <button @click="deleteComment(comment.id)" class="text-sm text-red-400 hover:text-red-600">
                 Eliminar
               </button>
             </div>
-            <p class="text-gray-200">{{ comment.content }}</p>
           </div>
           <p v-if="comments.length === 0" class="text-gray-400">Todavía no comentaste ninguna publicación.</p>
         </div>
       </div>
 
+
       <div v-else class="text-gray-400 italic">
         No se pudo cargar tu perfil.
       </div>
     </div>
+
 
     <!-- Modal de confirmación -->
     <ConfirmModal :visible="showModal" :title="modalTitle" :message="modalMessage" @confirm="confirmModal"

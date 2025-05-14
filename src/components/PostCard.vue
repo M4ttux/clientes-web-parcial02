@@ -104,7 +104,7 @@ export default {
       <div class="flex items-center gap-3">
         <!-- Imagen de perfil del autor -->
         <img
-          :src="post.user_profiles?.avatar_url || 'https://ui-avatars.com/api/?name=' + post.user_profiles?.display_name"
+          :src="post.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
           alt="Avatar"
           class="w-10 h-10 rounded-full border border-gray-500"
         />
@@ -146,7 +146,7 @@ export default {
         <div class="flex items-center gap-2 mb-1">
           <!-- Imagen del usuario que comentó -->
           <img
-            :src="comment.user_profiles?.avatar_url || 'https://ui-avatars.com/api/?name=' + comment.user_profiles?.display_name"
+            :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
             class="w-8 h-8 rounded-full border border-gray-500"
           />
 

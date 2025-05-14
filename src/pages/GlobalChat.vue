@@ -95,7 +95,7 @@ export default {
               <div class="flex items-center gap-3 mb-2">
                 <!-- Avatar -->
                 <img
-                  :src="message.user_profiles?.avatar_url || 'https://ui-avatars.com/api/?name=' + message.user_profiles?.display_name"
+                  :src="message.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(message.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
                   alt="Avatar"
                   class="w-10 h-10 rounded-full border border-gray-500"
                 />
