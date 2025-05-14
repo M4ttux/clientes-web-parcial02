@@ -9,7 +9,7 @@ export default {
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
       <!-- Nombre del proyecto -->
       <div class="text-center md:text-left text-sm">
-        © {{ new Date().getFullYear() }} DV Social. Todos los derechos reservados.
+        © {{ new Date().getFullYear() }} Social Media. Todos los derechos reservados.
       </div>
 
       <!-- Enlaces -->
