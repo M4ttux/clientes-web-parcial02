@@ -141,7 +141,8 @@
 <template>
   <div class="flex justify-center">
     <div class="w-full max-w-4xl p-4">
-      <MainH1 class="mb-4 text-white text-center">Últimas Publicaciones</MainH1>
+      <MainH1 class="mb-4 text-white text-center">Publicaciones</MainH1>
+      
 
       <div v-if="user" class="mb-6">
         <textarea v-model="newPost" rows="3"
@@ -152,8 +153,9 @@
           {{ posting ? 'Publicando...' : 'Publicar' }}
         </button>
       </div>
-
+      <h2 class="mb-4 text-white text-center text-2xl">Últimas Publicaciones</h2>
       <MainLoader v-if="loading" class="mx-auto" />
+      
 
       <div v-else>
         <PostCard v-for="post in posts" :key="post.id" :post="post" />
