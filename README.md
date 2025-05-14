@@ -61,7 +61,7 @@ npm run dev
 
 ## 📄 Autores y Datos Académicos
 
-**Autor:** Matias Jose Neto  
+**Autores:** Matias Jose Neto | Matias Martinez
 **Carrera:** Diseño y Programacion Web  
 **Materia:** Clientes Web Mobile  
 **Comisión:** DWT4AV  
