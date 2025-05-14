@@ -1,4 +1,4 @@
-# 🌐 DV Social
+# 🌐 Social Media
 
 Social Media es una red social simple para la materia *Clientes Web Mobile*. Permite a los usuarios registrarse, publicar posts, comentar publicaciones, editar su perfil y participar en un chat global en tiempo real.
 
