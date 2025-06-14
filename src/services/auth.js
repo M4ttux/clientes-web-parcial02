@@ -196,6 +196,18 @@ function updateUser(data) {
   notifyAll();
 }
 
+/**
+ * Obtiene la sesión actual.
+ */
+export async function getCurrentSession() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
+  return data.session
+}
+
+/**
+ * Obtiene el usuario autenticado.
+ */
 export function getCurrentUser() {
   return user.id ? user : null;
 }

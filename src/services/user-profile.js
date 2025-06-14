@@ -172,3 +172,15 @@ export async function deleteCommentById(commentId) {
         throw new Error(error.message);
     }
 }
+
+export function subscribeToUserComments(userId, callback) {
+  return supabase
+    .channel('comentarios-usuario')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'comments',
+      filter: `user_profile_id=eq.${userId}`
+    }, callback)
+    .subscribe()
+}

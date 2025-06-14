@@ -81,7 +81,7 @@ export default {
 
     <!-- Botón para eliminar publicación (si tiene permiso) -->
     <div v-if="showDelete && onDelete" class="flex justify-end mt-2">
-      <button @click="onDelete(post.id)" class="text-sm text-red-400 hover:text-red-600">
+      <button @click="onDelete(post.id)" class="text-sm text-red-400 hover:text-red-600 cursor-pointer">
         Eliminar publicación
       </button>
     </div>

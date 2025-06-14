@@ -1,5 +1,4 @@
 <script>
-import supabase from '../services/supabase'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -9,14 +8,16 @@ import PostCard from '../components/PostCard.vue'
 import MainLoader from '../components/MainLoader.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
-// Servicios relacionados al perfil del usuario
+// Servicios
 import {
   getUserProfileByPK,
   getPostsByUser,
   getCommentsByUser,
   deletePostById,
-  deleteCommentById
+  deleteCommentById,
+  subscribeToUserComments
 } from '../services/user-profile'
+import { getCurrentUser, getCurrentSession } from '../services/auth'
 
 export default {
   components: {
@@ -28,64 +29,56 @@ export default {
 
   setup() {
     const router = useRouter()
+    const perfil = ref(null)
+    const publicaciones = ref([])
+    const comentarios = ref([])
+    const cargando = ref(true)
 
-    // Refs reactivos
-    const profile = ref(null)
-    const posts = ref([])
-    const comments = ref([])
-    const loading = ref(true)
+    const mostrarModal = ref(false)
+    const tituloModal = ref('')
+    const mensajeModal = ref('')
+    const accionConfirmada = ref(null)
 
-    // Modal de confirmación
-    const showModal = ref(false)
-    const modalTitle = ref('')
-    const modalMessage = ref('')
-    const confirmAction = ref(null)
-
-    // Abre el modal con parámetros personalizados
-    const openModal = (title, message, action) => {
-      modalTitle.value = title
-      modalMessage.value = message
-      confirmAction.value = action
-      showModal.value = true
+    const abrirModal = (titulo, mensaje, accion) => {
+      tituloModal.value = titulo
+      mensajeModal.value = mensaje
+      accionConfirmada.value = accion
+      mostrarModal.value = true
     }
 
-    // Cierra el modal
-    const closeModal = () => {
-      showModal.value = false
-      confirmAction.value = null
+    const cerrarModal = () => {
+      mostrarModal.value = false
+      accionConfirmada.value = null
     }
 
-    // Ejecuta la acción confirmada y cierra el modal
-    const confirmModal = async () => {
-      if (confirmAction.value) await confirmAction.value()
-      closeModal()
+    const confirmarModal = async () => {
+      if (accionConfirmada.value) await accionConfirmada.value()
+      cerrarModal()
     }
 
-    // Lógica para eliminar una publicación
-    const deletePost = (id) => {
-      openModal(
+    const eliminarPublicacion = (id) => {
+      abrirModal(
         'Eliminar publicación',
         '¿Seguro que querés eliminar esta publicación?',
         async () => {
           try {
             await deletePostById(id)
-            posts.value = posts.value.filter(post => post.id !== id)
+            publicaciones.value = publicaciones.value.filter(p => p.id !== id)
           } catch (e) {
-            console.error('Error al eliminar post:', e)
+            console.error('Error al eliminar publicación:', e)
           }
         }
       )
     }
 
-    // Lógica para eliminar un comentario
-    const deleteComment = (id) => {
-      openModal(
+    const eliminarComentario = (id) => {
+      abrirModal(
         'Eliminar comentario',
         '¿Seguro que querés eliminar este comentario?',
         async () => {
           try {
             await deleteCommentById(id)
-            comments.value = comments.value.filter(comment => comment.id !== id)
+            comentarios.value = comentarios.value.filter(c => c.id !== id)
           } catch (e) {
             console.error('Error al eliminar comentario:', e)
           }
@@ -93,84 +86,58 @@ export default {
       )
     }
 
-    // Redirección a la vista de edición del perfil
-    const goToEdit = () => {
+    const irAEditarPerfil = () => {
       router.push({ name: 'MyProfileEdit' })
     }
 
-    // Canal para recibir comentarios en tiempo real
     let canalComentarios = null
 
-    // Carga del perfil, posts y comentarios al montar el componente
     onMounted(async () => {
       try {
-        // Obtenemos sesión actual
-        const {
-          data: { session },
-          error: sessionError
-        } = await supabase.auth.getSession()
+        const session = await getCurrentSession()
+        const usuario = getCurrentUser()
 
-        const user = session?.user
-
-        // Si no hay usuario autenticado
-        if (!user || sessionError || !user.id) {
+        if (!usuario?.id || !session) {
           console.warn('No hay usuario autenticado')
-          loading.value = false
+          cargando.value = false
           return
         }
 
-        // Cargar perfil, publicaciones y comentarios del usuario
-        const profileData = await getUserProfileByPK(user.id)
-        profile.value = profileData
+        const datosPerfil = await getUserProfileByPK(usuario.id)
+        perfil.value = datosPerfil
 
-        const userProfileId = profileData.id
-        posts.value = await getPostsByUser(userProfileId)
-        comments.value = await getCommentsByUser(userProfileId)
+        publicaciones.value = await getPostsByUser(datosPerfil.id)
+        comentarios.value = await getCommentsByUser(datosPerfil.id)
 
-        // Suscripción a nuevos comentarios del usuario
-        canalComentarios = supabase
-          .channel('comentarios-usuario')
-          .on(
-            'postgres_changes',
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'comments',
-              filter: `user_profile_id=eq.${user.id}`
-            },
-            async () => {
-              comments.value = await getCommentsByUser(user.id)
-            }
-          )
-          .subscribe()
+        canalComentarios = subscribeToUserComments(usuario.id, async () => {
+          comentarios.value = await getCommentsByUser(datosPerfil.id)
+        })
       } catch (error) {
-        console.error('Error al cargar perfil, publicaciones o comentarios:', error)
+        console.error('Error al cargar el perfil:', error)
       } finally {
-        loading.value = false
+        cargando.value = false
       }
     })
 
-    // Al desmontar el componente, se limpia el canal
     onUnmounted(() => {
       if (canalComentarios) {
-        supabase.removeChannel(canalComentarios)
+        canalComentarios.unsubscribe()
       }
     })
 
-    // Variables y métodos expuestos al template
     return {
-      profile,
-      posts,
-      comments,
-      loading,
-      goToEdit,
-      deletePost,
-      deleteComment,
-      showModal,
-      modalTitle,
-      modalMessage,
-      confirmModal,
-      closeModal
+      perfil,
+      publicaciones,
+      comentarios,
+      cargando,
+      irAEditarPerfil,
+      eliminarPublicacion,
+      eliminarComentario,
+      mostrarModal,
+      tituloModal,
+      mensajeModal,
+      confirmarModal,
+      cerrarModal
     }
   }
 }
@@ -180,49 +147,57 @@ export default {
   <div class="w-full max-w-4xl mx-auto p-4">
     <div class="flex justify-between items-center mb-4">
       <MainH1 class="text-white">Mi Perfil</MainH1>
-      <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded" @click="goToEdit">
+      <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded" @click="irAEditarPerfil">
         Editar perfil
       </button>
     </div>
 
-
-    <MainLoader v-if="loading" class="mx-auto" />
-
+    <MainLoader v-if="cargando" class="mx-auto" />
 
     <div v-else>
-      <div v-if="profile">
+      <div v-if="perfil">
         <!-- Datos del perfil -->
         <div class="bg-gray-800 text-white rounded-xl p-4 shadow mb-6 text-center">
           <div class="flex justify-center mb-4">
             <img
-              :src="profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.display_name)}&background=4b5563&color=ffffff`"
+              :src="perfil.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(perfil.display_name)}&background=4b5563&color=ffffff`"
               alt="Avatar" class="w-24 h-24 rounded-full border border-gray-600" />
           </div>
-          <h2 class="text-2xl font-bold mb-1">{{ profile.display_name }}</h2>
+          <h2 class="text-2xl font-bold mb-1">{{ perfil.display_name }}</h2>
           <p class="text-sm text-gray-400 mb-2">
-            Te uniste el {{ new Date(profile.created_at).toLocaleDateString('es-AR') }}
+            Te uniste el {{ new Date(perfil.created_at).toLocaleDateString('es-AR') }}
           </p>
-          <p class="mb-2"><strong>Biografía:</strong> {{ profile.bio || 'Sin biografía' }}</p>
-          <p><strong>Carrera:</strong> {{ profile.career || 'No especificada' }}</p>
+          <p class="mb-2"><strong>Biografía:</strong> {{ perfil.bio || 'Sin biografía' }}</p>
+          <p><strong>Carrera:</strong> {{ perfil.career || 'No especificada' }}</p>
         </div>
-
 
         <!-- Publicaciones -->
         <div>
           <h3 class="text-xl text-white font-semibold mb-3">Mis Publicaciones</h3>
-          <PostCard v-for="post in posts" :key="post.id" :post="post" :showDelete="true" :onDelete="deletePost" />
-          <p v-if="posts.length === 0" class="text-gray-400">Todavía no publicaste nada.</p>
+          <PostCard
+            v-for="post in publicaciones"
+            :key="post.id"
+            :post="post"
+            :showDelete="true"
+            :onDelete="eliminarPublicacion"
+          />
+          <p v-if="publicaciones.length === 0" class="text-gray-400">Todavía no publicaste nada.</p>
         </div>
-
 
         <!-- Comentarios -->
         <div class="mt-8">
           <h3 class="text-xl text-white font-semibold mb-3">Mis Comentarios</h3>
-          <div v-for="comment in comments" :key="comment.id" class="bg-gray-700 text-white p-3 rounded-lg mb-3">
+          <div
+            v-for="comment in comentarios"
+            :key="comment.id"
+            class="bg-gray-700 text-white p-3 rounded-lg mb-3"
+          >
             <div class="flex items-center gap-3 mb-1">
               <img
                 :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name || '')}&background=4b5563&color=ffffff`"
-                alt="avatar" class="w-8 h-8 rounded-full border border-gray-500" />
+                alt="avatar"
+                class="w-8 h-8 rounded-full border border-gray-500"
+              />
               <span class="font-semibold text-blue-300 text-sm">
                 {{ comment.user_profiles?.display_name || 'Anónimo' }}
               </span>
@@ -232,24 +207,27 @@ export default {
             </div>
             <p class="text-gray-200">{{ comment.content }}</p>
             <div class="text-right mt-1">
-              <button @click="deleteComment(comment.id)" class="text-sm text-red-400 hover:text-red-600">
+              <button @click="eliminarComentario(comment.id)" class="text-sm text-red-400 hover:text-red-600 cursor-pointer">
                 Eliminar
               </button>
             </div>
           </div>
-          <p v-if="comments.length === 0" class="text-gray-400">Todavía no comentaste ninguna publicación.</p>
+          <p v-if="comentarios.length === 0" class="text-gray-400">Todavía no comentaste ninguna publicación.</p>
         </div>
       </div>
-
 
       <div v-else class="text-gray-400 italic">
         No se pudo cargar tu perfil.
       </div>
     </div>
 
-
     <!-- Modal de confirmación -->
-    <ConfirmModal :visible="showModal" :title="modalTitle" :message="modalMessage" @confirm="confirmModal"
-      @cancel="closeModal" />
+    <ConfirmModal
+      :visible="mostrarModal"
+      :title="tituloModal"
+      :message="mensajeModal"
+      @confirm="confirmarModal"
+      @cancel="cerrarModal"
+    />
   </div>
 </template>
