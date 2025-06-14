@@ -1,247 +1,214 @@
 <script>
-import { ref, onMounted } from "vue"
-import { useRouter } from "vue-router"
-import MainH1 from "../components/MainH1.vue"
-import MainLoader from "../components/MainLoader.vue"
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import MainH1 from '../components/MainH1.vue'
+import MainLoader from '../components/MainLoader.vue'
 
-// Funciones de servicio relacionadas con perfiles y autenticación
+// Servicios
 import {
   getUserProfileByPK,
   updateUserProfile,
-} from "../services/user-profile"
-import supabase from "../services/supabase"
-import { cambiarPassword } from "../services/auth"
+  uploadUserAvatar
+} from '../services/user-profile'
+
+import {
+  cambiarPassword,
+  getCurrentUser,
+  getCurrentSession
+} from '../services/auth'
 
 export default {
   components: {
     MainH1,
-    MainLoader,
+    MainLoader
   },
 
   setup() {
     const router = useRouter()
 
-    // Refs reactivas para estado de perfil, loading y errores
-    const profile = ref(null)
-    const loading = ref(true)
-    const saving = ref(false)
-    const errorMsg = ref("")
-    const nuevaPassword = ref("")
+    const perfil = ref(null)
+    const cargando = ref(true)
+    const guardando = ref(false)
+    const mensajeError = ref('')
+    const nuevaPassword = ref('')
+    const display_name = ref('')
+    const bio = ref('')
+    const carrera = ref('')
 
-    // Campos editables del formulario
-    const display_name = ref("")
-    const bio = ref("")
-    const career = ref("")
-
-    // Al montar el componente, obtener la sesión y cargar perfil
     onMounted(async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const session = await getCurrentSession()
+      const usuario = getCurrentUser()
 
-      const user = session?.user
-
-      // Si no hay sesión, redirigir a login
-      if (!user) {
-        router.push({ name: "Login" })
+      if (!session || !usuario?.id) {
+        router.push({ name: 'Login' })
         return
       }
 
       try {
-        // Cargar los datos actuales del perfil
-        const profileData = await getUserProfileByPK(user.id)
-        profile.value = profileData
-        display_name.value = profileData.display_name || ""
-        bio.value = profileData.bio || ""
-        career.value = profileData.career || ""
+        const datosPerfil = await getUserProfileByPK(usuario.id)
+        perfil.value = datosPerfil
+        display_name.value = datosPerfil.display_name || ''
+        bio.value = datosPerfil.bio || ''
+        carrera.value = datosPerfil.career || ''
       } catch (err) {
-        console.error("Error al traer perfil:", err)
-        errorMsg.value = "No se pudo cargar el perfil."
+        console.error('Error al cargar perfil:', err)
+        mensajeError.value = 'No se pudo cargar el perfil.'
       }
 
-      loading.value = false
+      cargando.value = false
     })
 
-    // Guardar cambios del perfil
-    const updateProfile = async () => {
-      errorMsg.value = ""
+    const guardarCambios = async () => {
+      mensajeError.value = ''
 
-      // Validación de nombre obligatorio
       if (!display_name.value.trim()) {
-        errorMsg.value = "El nombre es obligatorio."
+        mensajeError.value = 'El nombre es obligatorio.'
         return
       }
 
-      saving.value = true
+      guardando.value = true
 
       try {
-        // Actualizar campos del perfil
-        await updateUserProfile(profile.value.id, {
+        await updateUserProfile(perfil.value.id, {
           display_name: display_name.value,
           bio: bio.value,
-          career: career.value,
+          career: carrera.value
         })
 
-        // Si se ingresó nueva contraseña, validarla y actualizarla
-        if (nuevaPassword.value.trim() !== "") {
+        if (nuevaPassword.value.trim() !== '') {
           if (nuevaPassword.value.length < 6) {
-            errorMsg.value = "La contraseña debe tener al menos 6 caracteres."
-            saving.value = false
+            mensajeError.value = 'La contraseña debe tener al menos 6 caracteres.'
+            guardando.value = false
             return
           }
-
           await cambiarPassword(nuevaPassword.value)
         }
 
-        // Redirigir al perfil al guardar
-        router.push({ name: "MyProfile" })
+        router.push({ name: 'MyProfile' })
       } catch (err) {
-        console.error("Error al actualizar perfil:", err)
-        errorMsg.value = "Hubo un error al guardar los cambios."
+        console.error('Error al guardar cambios:', err)
+        mensajeError.value = 'Hubo un error al guardar los cambios.'
       } finally {
-        saving.value = false
+        guardando.value = false
       }
     }
 
-    // Subir y actualizar avatar de perfil
     const subirAvatar = async (e) => {
       const archivo = e.target.files[0]
       if (!archivo) return
 
-      // Generar nombre único basado en ID y timestamp
-      const nombreArchivo = `${profile.value.id}_${Date.now()}`
-
-      const { error } = await supabase.storage
-        .from("avatars")
-        .upload(nombreArchivo, archivo)
-
-      if (error) {
-        errorMsg.value = "No se pudo subir la imagen."
-        return
+      try {
+        const publicUrl = await uploadUserAvatar(perfil.value.id, archivo)
+        await updateUserProfile(perfil.value.id, { avatar_url: publicUrl })
+        perfil.value.avatar_url = publicUrl
+      } catch (err) {
+        mensajeError.value = err.message || 'No se pudo subir el avatar.'
       }
-
-      // Obtener URL pública y actualizar en el perfil
-      const publicUrl = supabase.storage
-        .from("avatars")
-        .getPublicUrl(nombreArchivo).data.publicUrl
-
-      await updateUserProfile(profile.value.id, { avatar_url: publicUrl })
-      profile.value.avatar_url = publicUrl
     }
 
     return {
       display_name,
       bio,
-      career,
+      carrera,
       nuevaPassword,
-      loading,
-      saving,
-      updateProfile,
-      errorMsg,
+      cargando,
+      guardando,
+      guardarCambios,
+      mensajeError,
       subirAvatar,
-      profile,
+      perfil
     }
-  },
+  }
 }
 </script>
 
-
 <template>
-  <div class="w-full max-w-xl mx-auto p-4">
-    <MainH1 class="text-white text-center mb-4">Editar Perfil</MainH1>
+  <div class="w-full max-w-2xl mx-auto p-6">
+    <MainH1 class="text-white text-center mb-6">Editar Perfil</MainH1>
 
-    <MainLoader v-if="loading" class="mx-auto" />
+    <MainLoader v-if="cargando" class="mx-auto" />
+    <div v-else class="bg-gray-800 text-white p-6 rounded-2xl shadow-xl">
+      <form @submit.prevent="guardarCambios" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="nombre" class="block text-sm font-semibold mb-1">Nombre para mostrar *</label>
+            <input
+              id="nombre"
+              type="text"
+              v-model="display_name"
+              class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
 
-    <form
-      v-else
-      @submit.prevent="updateProfile"
-      class="bg-gray-800 text-white p-6 rounded-xl shadow-lg space-y-4"
-    >
-      <div>
-        <label for="name" class="block text-sm mb-1"
-          >Nombre para mostrar *</label
-        >
-        <input
-          id="name"
-          type="text"
-          v-model="display_name"
-          class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
-          required
-        />
-      </div>
+          <div>
+            <label for="carrera" class="block text-sm font-semibold mb-1">Carrera</label>
+            <input
+              id="carrera"
+              type="text"
+              v-model="carrera"
+              class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
 
-      <div>
-        <label for="career" class="block text-sm mb-1">Carrera</label>
-        <input
-          id="career"
-          type="text"
-          v-model="career"
-          class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
-        />
-      </div>
+        <div>
+          <label for="bio" class="block text-sm font-semibold mb-1">Biografía</label>
+          <textarea
+            id="bio"
+            v-model="bio"
+            rows="4"
+            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+        </div>
 
-      <div>
-        <label for="bio" class="block text-sm mb-1">Biografía</label>
-        <textarea
-          id="bio"
-          v-model="bio"
-          rows="4"
-          class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
-        ></textarea>
-      </div>
+        <div v-if="perfil?.avatar_url" class="flex justify-center">
+          <img
+            :src="perfil.avatar_url"
+            alt="Avatar"
+            class="w-28 h-28 rounded-full border-2 border-gray-700 mb-3"
+          />
+        </div>
 
-      <!-- Imagen actual -->
-      <div class="mb-4" v-if="profile?.avatar_url">
-        <img
-          :src="profile.avatar_url"
-          alt="Avatar"
-          class="w-24 h-24 rounded-full mx-auto mb-2 border border-gray-600"
-        />
-      </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Imagen de perfil</label>
+          <input
+            type="file"
+            @change="subirAvatar"
+            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
+          />
+        </div>
 
-      <!-- Subida de nueva imagen -->
-      <div class="mb-4">
-        <label class="block text-sm mb-1 text-white">Imagen de perfil</label>
-        <input
-          type="file"
-          @change="subirAvatar"
-          class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
-        />
-      </div>
+        <div class="flex justify-center">
+          <RouterLink
+            to="/cambiar-password"
+            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm"
+          >
+            Cambiar contraseña
+          </RouterLink>
+        </div>
 
-      <!-- Cambiar contraseña -->
-      <div class="flex justify-center">
-        <RouterLink
-          to="/cambiar-password"
-          class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm"
-        >
-          Cambiar contraseña
-        </RouterLink>
-      </div>
+        <p v-if="mensajeError" class="text-red-400 text-sm text-center">{{ mensajeError }}</p>
 
-      <!-- Errores -->
-      <p v-if="errorMsg" class="text-red-400 text-sm">{{ errorMsg }}</p>
+        <div class="flex justify-between pt-4">
+            <RouterLink
+              to="/mi-perfil"
+              class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-lg text-sm"
+            >
+              Volver
+            </RouterLink>
 
-<!-- Guardar + Volver -->
-<div class="flex justify-center gap-4 mt-4">
-  <!-- Botón Volver -->
-  <RouterLink
-    to="/mi-perfil"
-    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-  >
-    Volver al perfil
-  </RouterLink>
+            <button
+              type="submit"
+              :disabled="guardando"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+            >
+              {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+        </div>
 
-  <!-- Botón Guardar -->
-  <button
-    type="submit"
-    :disabled="saving"
-    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-  >
-    {{ saving ? "Guardando..." : "Guardar cambios" }}
-  </button>
-</div>
-
-    </form>
+        <p class="text-sm text-gray-400 text-center mt-4">(*) Campo obligatorio</p>
+      </form>
+    </div>
   </div>
 </template>

@@ -37,6 +37,26 @@ export async function updateUserProfile(id, data) {
 }
 
 /**
+ * Sube un nuevo avatar y devuelve su URL pública
+ * @param {string} userId
+ * @param {File} archivo
+ * @returns {Promise<string>}
+ */
+export async function uploadUserAvatar(userId, archivo) {
+  const nombreArchivo = `${userId}_${Date.now()}`;
+  const { error } = await supabase.storage.from("avatars").upload(nombreArchivo, archivo);
+
+  if (error) {
+    console.error("[user-profile.js uploadUserAvatar] Error al subir imagen:", error);
+    throw new Error("No se pudo subir la imagen: " + error.message);
+  }
+
+  const { data } = supabase.storage.from("avatars").getPublicUrl(nombreArchivo);
+  return data.publicUrl;
+}
+
+
+/**
  * Trae un perfil de usuario por ID.
  * @param {string} id
  * @returns {Promise<{id: string|null, email: string|null}>}

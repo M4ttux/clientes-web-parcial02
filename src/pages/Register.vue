@@ -63,51 +63,50 @@ export default {
   <div class="bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">
     <MainH1>Crear una Cuenta</MainH1>
 
-    <form @submit.prevent="handleSubmit">
-      <div class="mb-4">
-        <label for="display_name" class="block mb-2 text-gray-300">Nombre *</label>
+    <form @submit.prevent="handleSubmit" class="space-y-5">
+      <div>
+        <label for="display_name" class="block mb-1 text-sm text-gray-300">Nombre *</label>
         <input v-model="user.display_name" type="text" id="display_name"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>
 
-      <div class="mb-4">
-        <label for="bio" class="block mb-2 text-gray-300">Biografía</label>
+      <div>
+        <label for="bio" class="block mb-1 text-sm text-gray-300">Biografía</label>
         <textarea v-model="user.bio" id="bio" rows="3"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600"></textarea>
       </div>
 
-      <div class="mb-4">
-        <label for="career" class="block mb-2 text-gray-300">Carrera</label>
+      <div>
+        <label for="career" class="block mb-1 text-sm text-gray-300">Carrera</label>
         <input v-model="user.career" type="text" id="career"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>
 
-      <div class="mb-4">
-        <label for="email" class="block mb-2 text-gray-300">Email</label>
+      <div>
+        <label for="email" class="block mb-1 text-sm text-gray-300">Email</label>
         <input v-model="user.email" type="email" id="email"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>
 
-      <div class="mb-6">
-        <label for="password" class="block mb-2 text-gray-300">Contraseña</label>
+      <div>
+        <label for="password" class="block mb-1 text-sm text-gray-300">Contraseña</label>
         <input v-model="user.password" type="password" id="password"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>
 
-      <p v-if="errorMsg" class="text-red-400 text-sm mb-4">{{ errorMsg }}</p>
-      <p v-if="exito" class="text-green-400 text-sm mb-4">✔ Registro exitoso. Redirigiendo...</p>
+      <p v-if="errorMsg" class="text-red-400 text-sm">{{ errorMsg }}</p>
+      <p v-if="exito" class="text-green-400 text-sm">✔ Registro exitoso. Redirigiendo...</p>
 
-      <button type="submit"
-        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg">
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200">
         Crear Cuenta
       </button>
     </form>
 
-    <p class="text-sm text-gray-400 mt-2">(*) Campo obligatorio</p>
+    <p class="text-sm text-gray-400 mt-3">(*) Campo obligatorio</p>
 
     <div class="mt-4 text-center text-gray-300">
       <span>¿Ya tienes cuenta? </span>
-      <router-link to="/ingresar" class="text-blue-500 hover:text-blue-400">Iniciar sesión</router-link>
+      <router-link to="/ingresar" class="text-blue-400 hover:underline">Iniciar sesión</router-link>
     </div>
   </div>
 </template>

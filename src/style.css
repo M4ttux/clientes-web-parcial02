@@ -7,9 +7,13 @@ html {
 
 input::file-selector-button {
   font-weight: bold;
-  color: dodgerblue;
+  color: white;
   padding: 0.5em;
   margin-right: .75em;
   border: thin solid grey;
-  border-radius: 3px;
+  border-radius: 0.5rem;
+}
+
+button {
+  cursor: pointer;
 }

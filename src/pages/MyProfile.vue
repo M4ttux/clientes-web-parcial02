@@ -207,7 +207,7 @@ export default {
             </div>
             <p class="text-gray-200">{{ comment.content }}</p>
             <div class="text-right mt-1">
-              <button @click="eliminarComentario(comment.id)" class="text-sm text-red-400 hover:text-red-600 cursor-pointer">
+              <button @click="eliminarComentario(comment.id)" class="text-sm text-red-400 hover:text-red-600">
                 Eliminar
               </button>
             </div>
