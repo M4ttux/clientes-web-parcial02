@@ -103,6 +103,8 @@ export default {
       </button>
     </form>
 
+    <p class="text-sm text-gray-400 mt-2">(*) Campo obligatorio</p>
+
     <div class="mt-4 text-center text-gray-300">
       <span>¿Ya tienes cuenta? </span>
       <router-link to="/ingresar" class="text-blue-500 hover:text-blue-400">Iniciar sesión</router-link>

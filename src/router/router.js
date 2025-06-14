@@ -8,7 +8,7 @@ import Login from "../pages/Login.vue";
 import Register from "../pages/Register.vue";
 import MyProfile from "../pages/MyProfile.vue";
 import MyProfileEdit from "../pages/MyProfileEdit.vue";
-import CambiarPassword from "../pages/CambiarPassword.vue";
+import ChangePassword from "../pages/ChangePassword.vue";
 import UserProfile from "../pages/UserProfile.vue";
 import supabase from "../services/supabase";
 
@@ -36,8 +36,8 @@ const routes = [
   },
   {
     path: "/cambiar-password",
-    name: "CambiarPassword",
-    component: CambiarPassword,
+    name: "ChangePassword",
+    component: ChangePassword,
     meta: { requiresAuth: true }
   },
   {

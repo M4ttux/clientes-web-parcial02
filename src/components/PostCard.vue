@@ -118,16 +118,11 @@ export default {
         <!-- Avatar del autor -->
         <img
           :src="post.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
-          alt="Avatar"
-          class="w-10 h-10 rounded-full border border-gray-500"
-        />
+          alt="Avatar" class="w-10 h-10 rounded-full border border-gray-500" />
 
         <!-- Nombre del usuario -->
-        <router-link
-          v-if="post.user_profiles?.id"
-          :to="{ name: 'UserProfile', params: { id: post.user_profiles.id } }"
-          class="text-blue-400 hover:underline font-semibold"
-        >
+        <router-link v-if="post.user_profiles?.id" :to="{ name: 'UserProfile', params: { id: post.user_profiles.id } }"
+          class="text-blue-400 hover:underline font-semibold">
           {{ post.user_profiles?.display_name || 'Usuario desconocido' }}
         </router-link>
       </div>
@@ -141,10 +136,7 @@ export default {
 
     <!-- Botón para eliminar publicación (si tiene permiso) -->
     <div v-if="showDelete && onDelete" class="flex justify-end mt-2">
-      <button
-        @click="onDelete(post.id)"
-        class="text-sm text-red-400 hover:text-red-600"
-      >
+      <button @click="onDelete(post.id)" class="text-sm text-red-400 hover:text-red-600">
         Eliminar publicación
       </button>
     </div>
@@ -153,50 +145,43 @@ export default {
     <div v-if="comments.length > 0" class="mt-4 border-t border-gray-600 pt-3">
       <h3 class="text-sm text-gray-400 mb-2">Comentarios:</h3>
 
-      <div
-        v-for="comment in comments"
-        :key="comment.id"
-        class="bg-gray-700 p-2 rounded mb-2"
-      >
-        <div class="flex items-center gap-2 mb-1">
-          <!-- Avatar del comentarista -->
-          <img
-            :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
-            class="w-8 h-8 rounded-full border border-gray-500"
-          />
+      <ol class="space-y-2">
+        <li v-for="comment in comments" :key="comment.id" class="bg-gray-700 p-2 rounded">
+          <div class="flex items-center gap-2 mb-1">
+            <!-- Avatar del comentarista -->
+            <img
+              :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
+              class="w-8 h-8 rounded-full border border-gray-500" />
 
-          <!-- Nombre y fecha -->
-          <div class="flex justify-between items-center w-full">
-            <span class="text-blue-300 text-sm font-semibold">
-              {{ comment.user_profiles?.display_name || 'Anónimo' }}
-            </span>
-            <span class="text-xs text-gray-400">
-              {{ new Date(comment.created_at).toLocaleString('es-AR', {
-                dateStyle: 'short',
-                timeStyle: 'short'
-              }) }}
-            </span>
+            <!-- Nombre y fecha -->
+            <div class="flex justify-between items-center w-full">
+              <router-link :to="{ name: 'UserProfile', params: { id: comment.user_profiles.id } }"
+                class="text-blue-300 text-sm font-semibold hover:underline">
+                {{ comment.user_profiles.display_name }}
+              </router-link>
+              <span class="text-xs text-gray-400">
+                {{ new Date(comment.created_at).toLocaleString('es-AR', {
+                  dateStyle: 'short',
+                  timeStyle: 'short'
+                }) }}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <!-- Contenido del comentario -->
-        <p class="text-sm text-gray-200 whitespace-pre-wrap">{{ comment.content }}</p>
-      </div>
+          <!-- Contenido del comentario -->
+          <p class="text-sm text-gray-200 whitespace-pre-wrap">{{ comment.content }}</p>
+        </li>
+      </ol>
     </div>
 
     <!-- Formulario para agregar comentario -->
     <form @submit.prevent="addComment" class="mt-4">
-      <textarea
-        v-model="newComment"
-        rows="2"
+      <label for="comment" class="sr-only">Comentario</label>
+      <textarea id="comment" v-model="newComment" rows="2"
         class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400 resize-none"
-        placeholder="Escribí un comentario..."
-      ></textarea>
-      <button
-        type="submit"
-        class="mt-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm font-semibold"
-        :disabled="posting"
-      >
+        placeholder="Escribí un comentario..."></textarea>
+      <button type="submit" class="mt-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm font-semibold"
+        :disabled="posting">
         Comentar
       </button>
       <p v-if="loginWarning" class="text-red-400 text-sm mt-2">Debes estar logueado para comentar.</p>
