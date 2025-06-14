@@ -1,22 +1,12 @@
 <script>
 import { ref } from 'vue'
-import supabase from '../services/supabase'
+import { addComment } from '../services/comments'
 
 export default {
-  // Props que recibe el componente
   props: {
-    post: {
-      type: Object,
-      required: true
-    },
-    showDelete: {
-      type: Boolean,
-      default: false
-    },
-    onDelete: {
-      type: Function,
-      default: null
-    }
+    post: Object,
+    showDelete: Boolean,
+    onDelete: Function
   },
 
   setup(props) {
@@ -25,62 +15,19 @@ export default {
     const comments = ref(props.post.comments || [])
     const loginWarning = ref(false)
 
-    /**
-     * Envía un nuevo comentario al servidor.
-     * Valida si hay contenido y si el usuario está autenticado.
-     */
-    const addComment = async () => {
+    const submitComment = async () => {
       if (!newComment.value.trim()) return
 
       posting.value = true
       loginWarning.value = false
 
-      // Obtener usuario actual
-      const {
-        data: { user }
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        loginWarning.value = true
-        posting.value = false
-        return
-      }
-
-      // Obtener perfil del usuario
-      const { data: userProfile } = await supabase
-        .from('user_profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single()
-
-      // Insertar comentario
-      const { data, error } = await supabase
-        .from('comments')
-        .insert([
-          {
-            content: newComment.value,
-            post_id: props.post.id,
-            user_id: user.id,
-            user_profile_id: userProfile.id
-          }
-        ])
-        .select(`
-          id,
-          content,
-          created_at,
-          user_profiles (
-            id,
-            display_name,
-            avatar_url
-          )
-        `)
-        .single()
-
-      if (error) {
-        console.error('Error al comentar:', error)
-      } else {
-        comments.value.push(data)
+      try {
+        const comment = await addComment(newComment.value, props.post.id)
+        comments.value.push(comment)
         newComment.value = ''
+      } catch (err) {
+        if (err.message.includes('autenticado')) loginWarning.value = true
+        else console.error('Error al comentar:', err)
       }
 
       posting.value = false
@@ -88,7 +35,7 @@ export default {
 
     return {
       newComment,
-      addComment,
+      submitComment,
       posting,
       comments,
       loginWarning
@@ -96,9 +43,6 @@ export default {
   },
 
   computed: {
-    /**
-     * Devuelve la fecha formateada del post.
-     */
     formattedDate() {
       const date = new Date(this.post.created_at)
       return date.toLocaleString('es-AR', {
@@ -109,6 +53,7 @@ export default {
   }
 }
 </script>
+
 
 <template>
   <div class="bg-gray-800 text-white p-4 rounded-xl mb-4 shadow-md">
@@ -175,7 +120,7 @@ export default {
     </div>
 
     <!-- Formulario para agregar comentario -->
-    <form @submit.prevent="addComment" class="mt-4">
+    <form @submit.prevent="submitComment" class="mt-4">
       <label for="comment" class="sr-only">Comentario</label>
       <textarea id="comment" v-model="newComment" rows="2"
         class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400 resize-none"

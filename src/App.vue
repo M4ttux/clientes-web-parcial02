@@ -1,5 +1,4 @@
 <script>
-
 import Home from './pages/Home.vue';
 import { logout, subscribeToAuth } from './services/auth';
 import MainNav from './components/MainNav.vue';
@@ -27,14 +26,12 @@ export default {
     <MainNav />
 
     <!-- CONTENIDO PRINCIPAL -->
-      <main
-    :class="[
+    <main :class="[
       'flex-grow px-4 py-6',
       isCentered() ? 'flex items-center justify-center' : 'container mx-auto'
-    ]"
-  >
-    <router-view />
-  </main>
+    ]">
+      <router-view />
+    </main>
 
 
     <!-- FOOTER -->

@@ -195,3 +195,7 @@ function updateUser(data) {
   };
   notifyAll();
 }
+
+export function getCurrentUser() {
+  return user.id ? user : null;
+}

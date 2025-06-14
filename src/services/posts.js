@@ -1,4 +1,5 @@
 import supabase from './supabase';
+import { getCurrentUser } from './auth'
 
 /**
  * Trae todas las publicaciones con sus comentarios y perfiles de usuario.
@@ -37,17 +38,19 @@ export async function getAllPosts() {
 /**
  * Crea una nueva publicación y devuelve la creada.
  * @param {string} content
- * @param {string} userId
  * @returns {Promise<Object>}
  */
-export async function createPost(content, userId) {
+export async function createPost(content) {
+  const user = getCurrentUser()
+  if (!user?.id) throw new Error('Usuario no autenticado')
+
   const { data: profile, error: profileError } = await supabase
     .from('user_profiles')
     .select('id')
-    .eq('id', userId)
-    .single();
+    .eq('id', user.id)
+    .single()
 
-  if (profileError) throw profileError;
+  if (profileError) throw profileError
 
   const { data, error } = await supabase
     .from('posts')
@@ -76,10 +79,10 @@ export async function createPost(content, userId) {
         )
       )
     `)
-    .single();
+    .single()
 
-  if (error) throw error;
-  return data;
+  if (error) throw error
+  return data
 }
 
 /**
