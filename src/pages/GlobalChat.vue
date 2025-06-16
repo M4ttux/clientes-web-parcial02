@@ -92,7 +92,7 @@
 
 <template>
   <div class="flex items-center justify-center bg-gray-900 min-h-full px-4 py-6">
-    <div class="bg-gray-800 p-4 md:p-6 rounded-2xl shadow-lg w-full max-w-6xl">
+    <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg w-full max-w-6xl">
       <MainH1 class="text-white text-center mb-6">Chat Global</MainH1>
 
       <!-- Layout principal del chat -->
@@ -113,7 +113,7 @@
             <li
               v-for="message in messages"
               :key="message.id"
-              class="bg-gray-800 p-4 rounded-xl shadow-sm text-white"
+              class="bg-gray-800 p-4 rounded-lg shadow-lg text-white"
             >
               <div class="flex items-center gap-3 mb-2">
                 <!-- Avatar del autor del mensaje -->
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Formulario para enviar mensaje -->
-        <div class="w-full md:w-4/12 bg-gray-700 rounded-xl p-4 flex flex-col justify-between">
+        <div class="w-full md:w-4/12 bg-gray-700 rounded-lg p-4 flex flex-col justify-between">
           <div>
             <h2 class="text-xl font-bold text-white mb-4">Nuevo mensaje</h2>
             <p class="text-sm text-gray-300 mb-1"><strong>Usuario:</strong></p>
@@ -165,7 +165,7 @@
 
           <button
             type="submit"
-            class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition duration-200 mt-2"
+            class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg transition duration-200 mt-2"
             @click="sendMessage"
           >
             Enviar

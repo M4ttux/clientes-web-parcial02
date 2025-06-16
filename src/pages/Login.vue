@@ -33,7 +33,7 @@ export default {
 
 
 <template>
-  <div class="bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
     <MainH1>Iniciar sesión</MainH1>
 
     <form @submit.prevent="handleSubmit" class="space-y-5">
@@ -61,7 +61,7 @@ export default {
 
       <button
         type="submit"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200"
       >
         Ingresar
       </button>

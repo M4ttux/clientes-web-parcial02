@@ -60,7 +60,7 @@ export default {
 
 
 <template>
-  <div class="bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
     <MainH1>Crear una Cuenta</MainH1>
 
     <form @submit.prevent="handleSubmit" class="space-y-5">
@@ -97,7 +97,7 @@ export default {
       <p v-if="errorMsg" class="text-red-400 text-sm">{{ errorMsg }}</p>
       <p v-if="exito" class="text-green-400 text-sm">✔ Registro exitoso. Redirigiendo...</p>
 
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200">
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200">
         Crear Cuenta
       </button>
     </form>

@@ -12,6 +12,7 @@ export async function getAllPosts() {
       id,
       content,
       created_at,
+      image_url,
       user_profile_id,
       user_profiles (
         id,
@@ -36,11 +37,52 @@ export async function getAllPosts() {
 }
 
 /**
+ * Trae todas las publicaciones de un usuario.
+ * @param {string} userProfileId
+ */
+export async function getPostsByUser(userProfileId) {
+    const { data, error } = await supabase
+        .from("posts")
+        .select(
+            `
+      *,
+      user_profiles (
+        id,
+        display_name,
+        avatar_url
+      ),
+      comments (
+        id,
+        content,
+        created_at,
+        user_profiles (
+          id,
+          display_name,
+          avatar_url
+        )
+      )
+    `
+        )
+        .eq("user_profile_id", userProfileId)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(
+            "[user-profile.js getPostsByUser] Error al traer publicaciones:",
+            error
+        );
+        throw new Error(error.message);
+    }
+
+    return data;
+}
+
+/**
  * Crea una nueva publicación y devuelve la creada.
  * @param {string} content
  * @returns {Promise<Object>}
  */
-export async function createPost(content) {
+export async function createPost(content, imageUrl = null) {
   const user = getCurrentUser()
   if (!user?.id) throw new Error('Usuario no autenticado')
 
@@ -56,12 +98,14 @@ export async function createPost(content) {
     .from('posts')
     .insert({
       content,
-      user_profile_id: profile.id
+      user_profile_id: profile.id,
+      image_url: imageUrl
     })
     .select(`
       id,
       content,
       created_at,
+      image_url,
       user_profile_id,
       user_profiles (
         id,
@@ -83,6 +127,66 @@ export async function createPost(content) {
 
   if (error) throw error
   return data
+}
+
+/**
+ * Sube una imagen al bucket `post.imgs` y devuelve su URL pública.
+ * @param {File} archivo
+ * @returns {Promise<string>} URL pública de la imagen
+ */
+export async function uploadPostImage(archivo) {
+  const user = getCurrentUser()
+  if (!user?.id) throw new Error('Usuario no autenticado')
+
+  const nombreArchivo = `${Date.now()}_${archivo.name}`
+  const ruta = `${user.id}/${nombreArchivo}`
+
+  const { error } = await supabase.storage
+    .from('post.imgs')
+    .upload(ruta, archivo)
+
+  if (error) throw new Error('No se pudo subir la imagen: ' + error.message)
+
+  const { data } = supabase.storage
+    .from('post.imgs')
+    .getPublicUrl(ruta)
+
+  return data.publicUrl
+}
+
+/**
+ * Elimina un post por ID.
+ * @param {string} postId
+ */
+export async function deletePostById(postId) {
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+
+    console.log("Resultado deletePostById:", { success: !error });
+
+    if (error) {
+        console.error(
+            "[user-profile.js deletePostById] Error al eliminar el post:",
+            error
+        );
+        throw new Error(error.message);
+    }
+}
+
+/**
+ * Actualiza un post por ID.
+ * @param {string} postId
+ * @param {string} newContent
+ */
+export async function updatePostContent(postId, newContent) {
+  const { error } = await supabase
+    .from("posts")
+    .update({ content: newContent })
+    .eq("id", postId);
+
+  if (error) {
+    console.error("[posts.js updatePostContent] Error al actualizar contenido:", error);
+    throw new Error(error.message);
+  }
 }
 
 /**

@@ -4,11 +4,9 @@ import { useRoute } from "vue-router";
 import MainH1 from "../components/MainH1.vue";
 import PostCard from "../components/PostCard.vue";
 import MainLoader from "../components/MainLoader.vue";
-import {
-  getUserProfileByPK,
-  getPostsByUser,
-  getCommentsByUser,
-} from "../services/user-profile";
+import { getUserProfileByPK } from "../services/user-profile";
+import { getPostsByUser } from "../services/posts";
+import { getCommentsByUser } from "../services/comments";
 
 export default {
   components: {
@@ -53,14 +51,12 @@ export default {
 
     <div v-else>
       <!-- Datos del perfil -->
-      <div class="bg-gray-800 text-white rounded-xl p-4 shadow mb-6 text-center">
+      <div class="bg-gray-800 text-white rounded-lg p-4 shadow mb-6 text-center">
         <!-- Imagen de perfil -->
         <div class="flex justify-center mb-4">
           <img
             :src="profile.avatar_url ? profile.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.display_name)}&background=4b5563&color=ffffff`"
-            alt="Foto de perfil"
-            class="w-24 h-24 rounded-full border border-gray-600"
-          />
+            alt="Foto de perfil" class="w-24 h-24 rounded-full border border-gray-600" />
         </div>
 
         <h2 class="text-2xl font-bold mb-1">{{ profile.display_name }}</h2>
@@ -90,11 +86,7 @@ export default {
         <h3 class="text-xl text-white font-semibold mb-3">
           Comentarios realizados
         </h3>
-        <div
-          v-for="comment in comments"
-          :key="comment.id"
-          class="bg-gray-700 text-white p-3 rounded-lg mb-3"
-        >
+        <div v-for="comment in comments" :key="comment.id" class="bg-gray-700 text-white p-3 rounded-lg mb-3">
           <p class="text-sm text-gray-400 mb-1">
             Comentado el
             {{ new Date(comment.created_at).toLocaleString("es-AR") }}

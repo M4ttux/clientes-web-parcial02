@@ -52,7 +52,7 @@ const cambiar = async () => {
 </script>
 
 <template>
-  <div class="w-full max-w-md mx-auto mt-10 bg-gray-800 text-white p-6 rounded-xl shadow-lg">
+  <div class="w-full max-w-md mx-auto mt-10 bg-gray-800 text-white p-6 rounded-lg shadow-lg">
     <!-- Título -->
     <h2 class="text-xl font-semibold mb-4 text-center">Cambiar Contraseña</h2>
 
@@ -62,7 +62,7 @@ const cambiar = async () => {
       <input
         type="password"
         v-model="nuevaPassword"
-        class="w-full p-2 rounded bg-gray-700 border border-gray-600"
+        class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600"
       />
     </div>
 
@@ -72,7 +72,7 @@ const cambiar = async () => {
       <input
         type="password"
         v-model="repetirPassword"
-        class="w-full p-2 rounded bg-gray-700 border border-gray-600"
+        class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600"
       />
     </div>
 
@@ -87,7 +87,7 @@ const cambiar = async () => {
     <!-- Botón para confirmar -->
     <button
       @click="cambiar"
-      class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
     >
       Confirmar cambio
     </button>

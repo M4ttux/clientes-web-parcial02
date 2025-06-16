@@ -9,15 +9,10 @@ import MainLoader from '../components/MainLoader.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
 // Servicios
-import {
-  getUserProfileByPK,
-  getPostsByUser,
-  getCommentsByUser,
-  deletePostById,
-  deleteCommentById,
-  subscribeToUserComments
-} from '../services/user-profile'
+import { getUserProfileByPK } from '../services/user-profile'
 import { getCurrentUser, getCurrentSession } from '../services/auth'
+import { deletePostById, getPostsByUser, updatePostContent } from '../services/posts'
+import { getCommentsByUser, deleteCommentById, subscribeToUserComments } from '../services/comments'
 
 export default {
   components: {
@@ -69,6 +64,16 @@ export default {
           }
         }
       )
+    }
+
+    const handleEditarPost = async (postId, nuevoContenido) => {
+      try {
+        await updatePostContent(postId, nuevoContenido)
+        const post = publicaciones.value.find(p => p.id === postId)
+        if (post) post.content = nuevoContenido
+      } catch (error) {
+        console.error('Error al editar publicación:', error)
+      }
     }
 
     const eliminarComentario = (id) => {
@@ -137,7 +142,8 @@ export default {
       tituloModal,
       mensajeModal,
       confirmarModal,
-      cerrarModal
+      cerrarModal,
+      handleEditarPost
     }
   }
 }
@@ -147,7 +153,7 @@ export default {
   <div class="w-full max-w-4xl mx-auto p-4">
     <div class="flex justify-between items-center mb-4">
       <MainH1 class="text-white">Mi Perfil</MainH1>
-      <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded" @click="irAEditarPerfil">
+      <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg" @click="irAEditarPerfil">
         Editar perfil
       </button>
     </div>
@@ -157,7 +163,7 @@ export default {
     <div v-else>
       <div v-if="perfil">
         <!-- Datos del perfil -->
-        <div class="bg-gray-800 text-white rounded-xl p-4 shadow mb-6 text-center">
+        <div class="bg-gray-800 text-white rounded-lg p-4 shadow mb-6 text-center">
           <div class="flex justify-center mb-4">
             <img
               :src="perfil.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(perfil.display_name)}&background=4b5563&color=ffffff`"
@@ -174,30 +180,20 @@ export default {
         <!-- Publicaciones -->
         <div>
           <h3 class="text-xl text-white font-semibold mb-3">Mis Publicaciones</h3>
-          <PostCard
-            v-for="post in publicaciones"
-            :key="post.id"
-            :post="post"
-            :showDelete="true"
-            :onDelete="eliminarPublicacion"
-          />
+          <PostCard v-for="post in publicaciones" :key="post.id" :post="post" :showDelete="true" :showEdit="true"
+            :onDelete="eliminarPublicacion" :onEdit="handleEditarPost" />
+
           <p v-if="publicaciones.length === 0" class="text-gray-400">Todavía no publicaste nada.</p>
         </div>
 
         <!-- Comentarios -->
         <div class="mt-8">
           <h3 class="text-xl text-white font-semibold mb-3">Mis Comentarios</h3>
-          <div
-            v-for="comment in comentarios"
-            :key="comment.id"
-            class="bg-gray-700 text-white p-3 rounded-lg mb-3"
-          >
+          <div v-for="comment in comentarios" :key="comment.id" class="bg-gray-700 text-white p-3 rounded-lg mb-3">
             <div class="flex items-center gap-3 mb-1">
               <img
                 :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name || '')}&background=4b5563&color=ffffff`"
-                alt="avatar"
-                class="w-8 h-8 rounded-full border border-gray-500"
-              />
+                alt="avatar" class="w-8 h-8 rounded-full border border-gray-500" />
               <span class="font-semibold text-blue-300 text-sm">
                 {{ comment.user_profiles?.display_name || 'Anónimo' }}
               </span>
@@ -222,12 +218,7 @@ export default {
     </div>
 
     <!-- Modal de confirmación -->
-    <ConfirmModal
-      :visible="mostrarModal"
-      :title="tituloModal"
-      :message="mensajeModal"
-      @confirm="confirmarModal"
-      @cancel="cerrarModal"
-    />
+    <ConfirmModal :visible="mostrarModal" :title="tituloModal" :message="mensajeModal" @confirm="confirmarModal"
+      @cancel="cerrarModal" />
   </div>
 </template>

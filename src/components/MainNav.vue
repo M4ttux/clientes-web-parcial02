@@ -104,7 +104,7 @@ export default {
           <li>
             <router-link
               to="/"
-              class="block py-2 px-3 rounded-sm hover:text-blue-400 md:p-0"
+              class="block py-2 px-3 rounded-lg hover:text-blue-400 md:p-0"
               exact-active-class="text-blue-500"
             >
               Home

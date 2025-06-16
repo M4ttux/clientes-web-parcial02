@@ -127,7 +127,7 @@ export default {
     <MainH1 class="text-white text-center mb-6">Editar Perfil</MainH1>
 
     <MainLoader v-if="cargando" class="mx-auto" />
-    <div v-else class="bg-gray-800 text-white p-6 rounded-2xl shadow-xl">
+    <div v-else class="bg-gray-800 text-white p-6 rounded-lg shadow-lg">
       <form @submit.prevent="guardarCambios" class="space-y-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -175,14 +175,14 @@ export default {
           <input
             type="file"
             @change="subirAvatar"
-            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
+            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
           />
         </div>
 
         <div class="flex justify-center">
           <RouterLink
             to="/cambiar-password"
-            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm"
+            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
           >
             Cambiar contraseña
           </RouterLink>
@@ -193,7 +193,7 @@ export default {
         <div class="flex justify-between pt-4">
             <RouterLink
               to="/mi-perfil"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-lg text-sm"
+              class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-lg"
             >
               Volver
             </RouterLink>
@@ -201,7 +201,7 @@ export default {
             <button
               type="submit"
               :disabled="guardando"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg disabled:opacity-50"
             >
               {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
             </button>

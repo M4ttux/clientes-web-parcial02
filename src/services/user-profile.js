@@ -79,10 +79,10 @@ export async function getUserProfileByPK(id) {
     return data;
 }
 
-/**
+/*
  * Trae todas las publicaciones de un usuario.
  * @param {string} userProfileId
- */
+ *
 export async function getPostsByUser(userProfileId) {
     const { data, error } = await supabase
         .from("posts")
@@ -123,7 +123,7 @@ export async function getPostsByUser(userProfileId) {
 /**
  * Trae todos los comentarios realizados por un usuario.
  * @param {string} userProfileId
- */
+ *
 export async function getCommentsByUser(userProfileId) {
     const { data, error } = await supabase
         .from("comments")
@@ -154,10 +154,10 @@ export async function getCommentsByUser(userProfileId) {
     return data;
 }
 
-/**
+/*
  * Elimina un post por ID.
  * @param {string} postId
- */
+ *
 export async function deletePostById(postId) {
     const { error } = await supabase.from("posts").delete().eq("id", postId);
 
@@ -172,10 +172,10 @@ export async function deletePostById(postId) {
     }
 }
 
-/**
+
  * Elimina un comentario por ID.
  * @param {string} commentId
- */
+ *
 export async function deleteCommentById(commentId) {
     const { error } = await supabase
         .from("comments")
@@ -203,4 +203,4 @@ export function subscribeToUserComments(userId, callback) {
       filter: `user_profile_id=eq.${userId}`
     }, callback)
     .subscribe()
-}
+}*/
