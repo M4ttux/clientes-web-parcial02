@@ -59,21 +59,14 @@ const cambiar = async () => {
     <!-- Campo: Nueva contraseña -->
     <div class="mb-4">
       <label class="block mb-1">Nueva contraseña</label>
-      <input
-        type="password"
-        v-model="nuevaPassword"
-        class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600"
-      />
+      <input type="password" v-model="nuevaPassword" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600" />
     </div>
 
     <!-- Campo: Repetir contraseña -->
     <div class="mb-4">
       <label class="block mb-1">Repetir nueva contraseña</label>
-      <input
-        type="password"
-        v-model="repetirPassword"
-        class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600"
-      />
+      <input type="password" v-model="repetirPassword"
+        class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600" />
     </div>
 
     <!-- Mensaje de error -->
@@ -84,12 +77,17 @@ const cambiar = async () => {
       ✔ Contraseña actualizada correctamente.
     </p>
 
-    <!-- Botón para confirmar -->
-    <button
-      @click="cambiar"
-      class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-    >
-      Confirmar cambio
-    </button>
+    <div class="flex gap-4 mt-4">
+      <!-- Botón para volver -->
+      <button @click="router.push('/mi-perfil/editar')"
+        class="w-1/2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+        ← Volver a editar perfil
+      </button>
+
+      <!-- Botón para confirmar -->
+      <button @click="cambiar" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+        Confirmar cambio
+      </button>
+    </div>
   </div>
 </template>
