@@ -60,7 +60,7 @@ export default {
         const post = await createPost(newPost.value, imageUrl)
         posts.value.unshift(post)
         newPost.value = ''
-        imagen.value = null
+        eliminarImagen()
       } catch (err) {
         console.error('Error al crear el post:', err)
       }

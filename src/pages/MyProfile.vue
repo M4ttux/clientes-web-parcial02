@@ -11,7 +11,7 @@ import ConfirmModal from '../components/ConfirmModal.vue'
 // Servicios
 import { getUserProfileByPK } from '../services/user-profile'
 import { getCurrentUser, getCurrentSession } from '../services/auth'
-import { deletePostById, getPostsByUser, updatePostContent } from '../services/posts'
+import { deletePostById, getPostsByUser, updatePostContentWithImage } from '../services/posts'
 import { getCommentsByUser, deleteCommentById, subscribeToUserComments } from '../services/comments'
 
 export default {
@@ -66,15 +66,20 @@ export default {
       )
     }
 
-    const handleEditarPost = async (postId, nuevoContenido) => {
-      try {
-        await updatePostContent(postId, nuevoContenido)
-        const post = publicaciones.value.find(p => p.id === postId)
-        if (post) post.content = nuevoContenido
-      } catch (error) {
-        console.error('Error al editar publicación:', error)
-      }
+    const handleEditarPost = async (postId, nuevoContenido, nuevaImagen, removeImage) => {
+  try {
+    const imageUrl = await updatePostContentWithImage(postId, nuevoContenido, nuevaImagen, removeImage)
+
+    const post = publicaciones.value.find(p => p.id === postId)
+    if (post) {
+      post.content = nuevoContenido
+      if (imageUrl !== null || removeImage) post.image_url = imageUrl
     }
+
+  } catch (error) {
+    console.error('Error al editar publicación:', error)
+  }
+}
 
     const eliminarComentario = (id) => {
       abrirModal(
@@ -163,7 +168,7 @@ export default {
     <div v-else>
       <div v-if="perfil">
         <!-- Datos del perfil -->
-        <div class="bg-gray-800 text-white rounded-lg p-4 shadow mb-6 text-center">
+        <div class="bg-gray-800 text-white rounded-lg p-4 shadow-lg mb-6 text-center">
           <div class="flex justify-center mb-4">
             <img
               :src="perfil.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(perfil.display_name)}&background=4b5563&color=ffffff`"
@@ -203,7 +208,7 @@ export default {
             </div>
             <p class="text-gray-200">{{ comment.content }}</p>
             <div class="text-right mt-1">
-              <button @click="eliminarComentario(comment.id)" class="text-sm text-red-400 hover:text-red-600">
+              <button @click="eliminarComentario(comment.id)" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-sm text-white font-semibold rounded-lg transition">
                 Eliminar
               </button>
             </div>

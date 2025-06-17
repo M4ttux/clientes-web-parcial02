@@ -158,7 +158,7 @@
               id="body"
               :rows="textareaRowValue"
               v-model="newMessage.body"
-              class="w-full px-4 py-2 mb-4 rounded bg-gray-800 text-white border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              class="w-full px-4 py-2 mb-4 rounded-lg bg-gray-800 text-white border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               placeholder="Escribe tu mensaje aquí..."
             ></textarea>
           </div>

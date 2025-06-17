@@ -23,8 +23,11 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
   >
     <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-      <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
+      <h2 class="text-lg font-bold mb-4 text-center">{{ title }}</h2>
       <p class="mb-4">{{ message }}</p>
+      <p class="text-red-400 block mb-6">
+        Esta acción no se puede deshacer.
+      </p>
       <div class="flex justify-end gap-2">
         <button
           class="px-4 py-1 bg-gray-600 hover:bg-gray-700 rounded-lg"

@@ -51,7 +51,7 @@ export default {
 
     <div v-else>
       <!-- Datos del perfil -->
-      <div class="bg-gray-800 text-white rounded-lg p-4 shadow mb-6 text-center">
+      <div class="bg-gray-800 text-white rounded-lg p-4 shadow-lg mb-6 text-center">
         <!-- Imagen de perfil -->
         <div class="flex justify-center mb-4">
           <img
