@@ -11,7 +11,6 @@
     subscribeToGlobalChatNewMessages
   } from '../services/global-chat';
   import { subscribeToAuth } from '../services/auth';
-  import supabase from '../services/supabase';
 
   export default {
     name: 'GlobalChat',
