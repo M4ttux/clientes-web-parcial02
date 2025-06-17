@@ -3,8 +3,6 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainH1 from '../components/MainH1.vue'
 import MainLoader from '../components/MainLoader.vue'
-
-// Servicios
 import {
   getUserProfileByPK,
   updateUserProfile,
@@ -132,58 +130,36 @@ export default {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label for="nombre" class="block text-sm font-semibold mb-1">Nombre para mostrar *</label>
-            <input
-              id="nombre"
-              type="text"
-              v-model="display_name"
+            <input id="nombre" type="text" v-model="display_name"
               class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+              required />
           </div>
 
           <div>
             <label for="carrera" class="block text-sm font-semibold mb-1">Carrera</label>
-            <input
-              id="carrera"
-              type="text"
-              v-model="carrera"
-              class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <input id="carrera" type="text" v-model="carrera"
+              class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
 
         <div>
           <label for="bio" class="block text-sm font-semibold mb-1">Biografía</label>
-          <textarea
-            id="bio"
-            v-model="bio"
-            rows="4"
-            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          ></textarea>
+          <textarea id="bio" v-model="bio" rows="4"
+            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
         </div>
 
         <div v-if="perfil?.avatar_url" class="flex justify-center">
-          <img
-            :src="perfil.avatar_url"
-            alt="Avatar"
-            class="w-28 h-28 rounded-full border-2 border-gray-700 mb-3"
-          />
+          <img :src="perfil.avatar_url" alt="Avatar" class="w-28 h-28 rounded-full border-2 border-gray-700 mb-3" />
         </div>
 
         <div>
           <label class="block text-sm font-semibold mb-1">Imagen de perfil</label>
-          <input
-            type="file"
-            @change="subirAvatar"
-            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
-          />
+          <input type="file" @change="subirAvatar"
+            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer" />
         </div>
 
         <div class="flex justify-center">
-          <RouterLink
-            to="/cambiar-password"
-            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
-          >
+          <RouterLink to="/cambiar-password" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
             Cambiar contraseña
           </RouterLink>
         </div>
@@ -191,20 +167,14 @@ export default {
         <p v-if="mensajeError" class="text-red-400 text-sm text-center">{{ mensajeError }}</p>
 
         <div class="flex justify-between pt-4">
-            <RouterLink
-              to="/mi-perfil"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-lg"
-            >
-              Volver
-            </RouterLink>
+          <RouterLink to="/mi-perfil" class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
+            Volver
+          </RouterLink>
 
-            <button
-              type="submit"
-              :disabled="guardando"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg disabled:opacity-50"
-            >
-              {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
-            </button>
+          <button type="submit" :disabled="guardando"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg disabled:opacity-50">
+            {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
         </div>
 
         <p class="text-sm text-gray-400 text-center mt-4">(*) Campo obligatorio</p>

@@ -2,13 +2,11 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-// Componentes reutilizables
 import MainH1 from '../components/MainH1.vue'
 import PostCard from '../components/PostCard.vue'
 import MainLoader from '../components/MainLoader.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
-// Servicios
 import { getUserProfileByPK } from '../services/user-profile'
 import { getCurrentUser, getCurrentSession } from '../services/auth'
 import { deletePostById, getPostsByUser, updatePostContentWithImage } from '../services/posts'
@@ -67,19 +65,19 @@ export default {
     }
 
     const handleEditarPost = async (postId, nuevoContenido, nuevaImagen, removeImage) => {
-  try {
-    const imageUrl = await updatePostContentWithImage(postId, nuevoContenido, nuevaImagen, removeImage)
+      try {
+        const imageUrl = await updatePostContentWithImage(postId, nuevoContenido, nuevaImagen, removeImage)
 
-    const post = publicaciones.value.find(p => p.id === postId)
-    if (post) {
-      post.content = nuevoContenido
-      if (imageUrl !== null || removeImage) post.image_url = imageUrl
+        const post = publicaciones.value.find(p => p.id === postId)
+        if (post) {
+          post.content = nuevoContenido
+          if (imageUrl !== null || removeImage) post.image_url = imageUrl
+        }
+
+      } catch (error) {
+        console.error('Error al editar publicación:', error)
+      }
     }
-
-  } catch (error) {
-    console.error('Error al editar publicación:', error)
-  }
-}
 
     const eliminarComentario = (id) => {
       abrirModal(
@@ -208,7 +206,8 @@ export default {
             </div>
             <p class="text-gray-200">{{ comment.content }}</p>
             <div class="text-right mt-1">
-              <button @click="eliminarComentario(comment.id)" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-sm text-white font-semibold rounded-lg transition">
+              <button @click="eliminarComentario(comment.id)"
+                class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-sm text-white font-semibold rounded-lg transition">
                 Eliminar
               </button>
             </div>

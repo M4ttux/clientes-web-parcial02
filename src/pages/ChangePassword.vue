@@ -1,16 +1,14 @@
 <script setup>
-// Importamos lo necesario de Vue y del router
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { cambiarPassword } from '../services/auth'
 
-// Refs para manejar el estado de las contraseñas y feedback
 const nuevaPassword = ref('')
 const repetirPassword = ref('')
 const error = ref('')
 const exito = ref(false)
 
-// Obtenemos el router para redireccionar
+
 const router = useRouter()
 
 /**
@@ -20,31 +18,25 @@ const cambiar = async () => {
   error.value = ''
   exito.value = false
 
-  // Validación de longitud mínima
   if (nuevaPassword.value.length < 6) {
     error.value = 'La contraseña debe tener al menos 6 caracteres.'
     return
   }
 
-  // Validación de coincidencia entre ambas contraseñas
   if (nuevaPassword.value !== repetirPassword.value) {
     error.value = 'Las contraseñas no coinciden.'
     return
   }
 
   try {
-    // Llamada al servicio que cambia la contraseña
     await cambiarPassword(nuevaPassword.value)
 
-    // Mostramos mensaje de éxito
     exito.value = true
 
-    // Redireccionamos luego de 2 segundos
     setTimeout(() => {
-      router.push({ name: 'MyProfileEdit' }) // o { path: '/editar-perfil' }
+      router.push({ name: 'MyProfileEdit' })
     }, 2000)
   } catch (err) {
-    // Capturamos errores en consola y mostramos feedback
     error.value = 'Error al actualizar la contraseña.'
     console.error(err)
   }
