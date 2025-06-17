@@ -1,6 +1,6 @@
 <script>
-import { onMounted, ref } from 'vue'
-import { getAllPosts, createPost, uploadPostImage } from '../services/posts'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { getAllPosts, createPost, uploadPostImage, subscribeToPostsRealtime } from '../services/posts'
 import { subscribeToAuth } from '../services/auth'
 import PostCard from '../components/PostCard.vue'
 import MainH1 from '../components/MainH1.vue'
@@ -23,6 +23,9 @@ export default {
     const imagenError = ref("")
     const imagenPreview = ref(null)
 
+    let unsubscribe = null
+
+
     // Escuchar cambios en auth
     onMounted(async () => {
       subscribeToAuth((u) => {
@@ -30,7 +33,17 @@ export default {
       })
 
       await fetchPosts()
+
+      // Suscripción en tiempo real
+      unsubscribe = subscribeToPostsRealtime((updatedPosts) => {
+        posts.value = updatedPosts
+      })
+      
     })
+
+    onUnmounted(() => {
+        if (unsubscribe) unsubscribe()
+      })
 
     const fetchPosts = async () => {
       loading.value = true

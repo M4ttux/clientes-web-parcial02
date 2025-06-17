@@ -353,3 +353,35 @@ export function subscribeToNewPosts(callback) {
     )
     .subscribe();
 }
+
+
+/**
+ * Suscripción en tiempo real a la tabla posts y comments.
+ * @param {Function} callback - Se llama con el nuevo array de publicaciones actualizado.
+ */
+export function subscribeToPostsRealtime(callback) {
+  const channel = supabase.channel("realtime-posts-comments");
+
+  channel
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "posts" },
+      async () => {
+        const updatedPosts = await getAllPosts();
+        callback(updatedPosts);
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "comments" },
+      async () => {
+        const updatedPosts = await getAllPosts();
+        callback(updatedPosts);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
