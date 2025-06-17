@@ -4,15 +4,14 @@ import { addComment } from '../services/comments'
 
 const props = defineProps({
   postId: String,
-  initialComments: Array
+  comments: Array
 })
-
-const emit = defineEmits(['new-comment'])
 
 const newComment = ref('')
 const posting = ref(false)
 const loginWarning = ref(false)
-const comments = ref([...props.initialComments])
+
+const emit = defineEmits(['new-comment'])
 
 async function submitComment() {
   if (!newComment.value.trim()) return
@@ -21,9 +20,8 @@ async function submitComment() {
 
   try {
     const comment = await addComment(newComment.value, props.postId)
-    comments.value.push(comment)
     newComment.value = ''
-    emit('new-comment', comment)
+    emit('new-comment', comment)  // avisamos al padre
   } catch (err) {
     if (err.message.includes('autenticado')) {
       loginWarning.value = true
@@ -34,6 +32,7 @@ async function submitComment() {
 
   posting.value = false
 }
+
 </script>
 
 <template>
@@ -42,8 +41,7 @@ async function submitComment() {
 
     <ul class="space-y-3">
       <li
-        v-for="comment in comments"
-        :key="comment.id"
+        v-for="comment in props.comments" :key="comment.id"
         class="bg-gray-700 rounded-lg p-3 text-sm"
       >
         <div class="flex items-start gap-3 mb-1">

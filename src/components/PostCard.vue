@@ -81,7 +81,8 @@ export default {
     </div>
 
     <!-- Comentarios -->
-    <PostComments :post-id="post.id" :initial-comments="post.comments" />
+    <PostComments :post-id="post.id" :comments="post.comments" />
+
 
     <!-- Modal -->
     <EditPostModal :visible="showModal" :post="post" @submit="handleEditSubmit" @close="showModal = false" />
