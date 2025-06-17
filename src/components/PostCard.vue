@@ -65,7 +65,7 @@ export default {
     <!-- Imagen -->
     <div v-if="post.image_url" class="mb-4">
       <img :src="post.image_url" alt="Imagen del post"
-        class="max-w-[150px] mx-auto object-cover rounded-lg border border-gray-700 shadow-lg" />
+        class=" w-full max-w-[500px] mx-auto object-cover rounded-lg border border-gray-700 shadow-lg" />
     </div>
 
     <!-- Botones de acción -->

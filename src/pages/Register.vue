@@ -33,6 +33,16 @@ export default {
         return;
       }
 
+      if (!this.user.password.trim()) {
+        this.errorMsg = "La contraseña es obligatoria.";
+        return;
+      }
+
+      if (!this.user.career.trim()) {
+        this.errorMsg = "La carrera es obligatoria.";
+        return;
+      }
+
       if (this.user.password.length < 6) {
         this.errorMsg = "La contraseña debe tener al menos 6 caracteres.";
         return;
@@ -77,19 +87,19 @@ export default {
       </div>
 
       <div>
-        <label for="career" class="block mb-1 text-sm text-gray-300">Carrera</label>
+        <label for="career" class="block mb-1 text-sm text-gray-300">Carrera *</label>
         <input v-model="user.career" type="text" id="career"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>
 
       <div>
-        <label for="email" class="block mb-1 text-sm text-gray-300">Email</label>
+        <label for="email" class="block mb-1 text-sm text-gray-300">Email *</label>
         <input v-model="user.email" type="email" id="email"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>
 
       <div>
-        <label for="password" class="block mb-1 text-sm text-gray-300">Contraseña</label>
+        <label for="password" class="block mb-1 text-sm text-gray-300">Contraseña *</label>
         <input v-model="user.password" type="password" id="password"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>

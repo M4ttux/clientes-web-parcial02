@@ -78,3 +78,23 @@ export async function getUserProfileByPK(id) {
 
     return data;
 }
+
+/**
+ * Trae el display_name del usuario por ID.
+ * @param {string} userId
+ * @returns {Promise<{display_name: string} | null>}
+ */
+export async function getUserDisplayName(userId) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('display_name')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('[getUserDisplayName] Error al traer display_name:', error);
+    return null;
+  }
+
+  return data;
+}
