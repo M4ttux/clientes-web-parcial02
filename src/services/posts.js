@@ -257,6 +257,11 @@ export async function updatePostContentWithImage(
   return imageUrl;
 }
 
+/*
+* Extrae la ruta del storage desde una URL pública de Supabase.
+*
+*/
+
 function getStoragePathFromUrl(url) {
   try {
     const bucketName = "post.imgs";

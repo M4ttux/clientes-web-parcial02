@@ -21,7 +21,7 @@ async function submitComment() {
   try {
     const comment = await addComment(newComment.value, props.postId)
     newComment.value = ''
-    emit('new-comment', comment)  // avisamos al padre
+    emit('new-comment', comment)
   } catch (err) {
     if (err.message.includes('autenticado')) {
       loginWarning.value = true

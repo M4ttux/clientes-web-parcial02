@@ -95,6 +95,10 @@ export async function deleteCommentById(commentId) {
     }
 }
 
+/**
+ * Suscribe a los cambios de comentarios de un usuario específico.
+ * 
+ */
 export function subscribeToUserComments(userId, callback) {
   return supabase
     .channel('comentarios-usuario')
