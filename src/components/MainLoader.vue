@@ -1,7 +1,7 @@
 <template>
     <div class="loader">
         <div class="sr-only">Cargando...</div>
-    </div> 
+    </div>
 </template>
 
 <style scoped>
@@ -13,6 +13,7 @@
     border-right-color: #333;
     animation: l2 1s infinite linear;
 }
+
 @keyframes l2 {
     to {
         transform: rotate(1turn);

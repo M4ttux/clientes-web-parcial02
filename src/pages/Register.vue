@@ -107,7 +107,8 @@ export default {
       <p v-if="errorMsg" class="text-red-400 text-sm">{{ errorMsg }}</p>
       <p v-if="exito" class="text-green-400 text-sm">✔ Registro exitoso. Redirigiendo...</p>
 
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200">
+      <button type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200">
         Crear Cuenta
       </button>
     </form>

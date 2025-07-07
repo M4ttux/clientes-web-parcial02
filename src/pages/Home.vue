@@ -38,12 +38,12 @@ export default {
       unsubscribe = subscribeToPostsRealtime((updatedPosts) => {
         posts.value = updatedPosts
       })
-      
+
     })
 
     onUnmounted(() => {
-        if (unsubscribe) unsubscribe()
-      })
+      if (unsubscribe) unsubscribe()
+    })
 
     const fetchPosts = async () => {
       loading.value = true
@@ -132,8 +132,6 @@ export default {
   <div class="flex justify-center">
     <div class="w-full max-w-4xl p-4">
       <MainH1 class="mb-4 text-white text-center">Publicaciones</MainH1>
-
-
       <div v-if="user" class="mb-6 p-5 bg-gray-800 rounded-lg border border-gray-700 shadow-lg space-y-4">
         <div>
           <label for="newPost" class="block text-sm text-gray-300 mb-2">Crear una nueva publicación</label>
@@ -148,8 +146,8 @@ export default {
             <label class="block text-sm text-gray-300 mb-2">Imagen (opcional)</label>
 
             <!-- Botón personalizado -->
-            <label for="imagen"
-              class="inline-block cursor-pointer bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition border border-gray-500">
+            <label for="imagen" tabindex="0" role="button"
+              class="inline-block cursor-pointer bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
               Seleccionar Imagen
             </label>
 
@@ -169,7 +167,6 @@ export default {
             </div>
           </div>
 
-
           <!-- Botón -->
           <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg shadow-lg transition"
             :disabled="posting" @click="handleCreatePost">
@@ -178,11 +175,8 @@ export default {
         </div>
       </div>
 
-
-
       <h2 class="mb-4 text-white text-center text-2xl">Últimas Publicaciones</h2>
       <MainLoader v-if="loading" class="mx-auto" />
-
 
       <ol v-else class="space-y-4">
         <li v-for="post in posts" :key="post.id">

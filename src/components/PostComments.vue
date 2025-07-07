@@ -39,22 +39,16 @@ async function submitComment() {
   <div class="mt-5 border-t border-gray-700 pt-4">
     <h3 class="text-sm text-gray-400 mb-3">Comentarios</h3>
 
-    <ul class="space-y-3">
-      <li
-        v-for="comment in props.comments" :key="comment.id"
-        class="bg-gray-700 rounded-lg p-3 text-sm"
-      >
+    <ol class="space-y-3">
+      <li v-for="comment in props.comments" :key="comment.id" class="bg-gray-700 rounded-lg p-3 text-sm">
         <div class="flex items-start gap-3 mb-1">
           <img
             :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name)}&background=4b5563&color=ffffff`"
-            class="w-8 h-8 rounded-full border border-gray-600"
-          />
+            class="w-8 h-8 rounded-full border border-gray-600" />
           <div class="w-full">
             <div class="flex justify-between">
-              <router-link
-                :to="{ name: 'UserProfile', params: { id: comment.user_profiles.id } }"
-                class="text-blue-300 font-semibold hover:underline"
-              >
+              <router-link :to="{ name: 'UserProfile', params: { id: comment.user_profiles.id } }"
+                class="text-blue-300 font-semibold hover:underline">
                 {{ comment.user_profiles.display_name }}
               </router-link>
               <span class="text-xs text-gray-400">
@@ -70,28 +64,21 @@ async function submitComment() {
           </div>
         </div>
       </li>
-    </ul>
+    </ol>
 
     <form @submit.prevent="submitComment" class="mt-5">
-      <textarea
-        v-model="newComment"
-        rows="2"
+      <label for="comment" class="sr-only">Comentario</label>
+      <textarea v-model="newComment" rows="2" id="comment"
         class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg placeholder-gray-400 resize-none"
-        placeholder="Escribí un comentario..."
-      ></textarea>
+        placeholder="Escribí un comentario..."></textarea>
       <div class="flex justify-end mt-2">
-        <button
-          type="submit"
+        <button type="submit"
           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50"
-          :disabled="posting"
-        >
+          :disabled="posting">
           Comentar
         </button>
       </div>
-      <p
-        v-if="loginWarning"
-        class="text-red-400 text-sm mt-2 text-center"
-      >
+      <p v-if="loginWarning" class="text-red-400 text-sm mt-2 text-center">
         Debes estar logueado para comentar.
       </p>
     </form>

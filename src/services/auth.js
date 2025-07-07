@@ -1,5 +1,9 @@
 import supabase from "./supabase";
-import { addUserProfile, getUserProfileByPK, updateUserProfile } from "./user-profile";
+import {
+  addUserProfile,
+  getUserProfileByPK,
+  updateUserProfile,
+} from "./user-profile";
 
 // Estado global del usuario autenticado
 let user = {
@@ -45,7 +49,10 @@ async function loadCurrentUserProfile() {
       ...profile,
     });
   } catch (error) {
-    console.error('[auth.js loadCurrentUserProfile] Error al obtener el perfil del usuario: ', error);
+    console.error(
+      "[auth.js loadCurrentUserProfile] Error al obtener el perfil del usuario: ",
+      error
+    );
     throw error;
   }
 }
@@ -56,11 +63,14 @@ async function loadCurrentUserProfile() {
  */
 export async function cambiarPassword(nuevaPassword) {
   const { error } = await supabase.auth.updateUser({
-    password: nuevaPassword
+    password: nuevaPassword,
   });
 
   if (error) {
-    console.error('[auth.js cambiarPassword] Error al cambiar la contraseña:', error);
+    console.error(
+      "[auth.js cambiarPassword] Error al cambiar la contraseña:",
+      error
+    );
     throw new Error(error.message);
   }
 }
@@ -78,7 +88,7 @@ export async function register(email, password, profileData) {
   });
 
   if (error) {
-    console.error('[auth.js register] Error al registrarse: ', error);
+    console.error("[auth.js register] Error al registrarse: ", error);
     throw error;
   }
 
@@ -91,7 +101,10 @@ export async function register(email, password, profileData) {
       career: profileData.career,
     });
   } catch (error) {
-    console.error('[auth.js register] Error al crear el perfil del usuario: ', error);
+    console.error(
+      "[auth.js register] Error al crear el perfil del usuario: ",
+      error
+    );
   }
 
   updateUser({
@@ -115,7 +128,7 @@ export async function login(email, password) {
   });
 
   if (error) {
-    console.error('[auth.js login] Error al iniciar sesión: ', error);
+    console.error("[auth.js login] Error al iniciar sesión: ", error);
     throw error;
   }
 
@@ -151,7 +164,10 @@ export async function updateAuthProfile(data) {
     await updateUserProfile(user.id, { ...data });
     updateUser(data); // Reflejamos los cambios localmente
   } catch (error) {
-    console.error('[auth.js updateAuthProfile] Error al actualizar el perfil del usuario autenticado: ', error);
+    console.error(
+      "[auth.js updateAuthProfile] Error al actualizar el perfil del usuario autenticado: ",
+      error
+    );
     throw error;
   }
 }
@@ -181,7 +197,7 @@ function notify(callback) {
  * Notifica a todos los observadores que el estado del usuario cambió.
  */
 function notifyAll() {
-  observers.forEach(callback => notify(callback));
+  observers.forEach((callback) => notify(callback));
 }
 
 /**
@@ -200,9 +216,9 @@ function updateUser(data) {
  * Obtiene la sesión actual.
  */
 export async function getCurrentSession() {
-  const { data, error } = await supabase.auth.getSession()
-  if (error) throw error
-  return data.session
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  return data.session;
 }
 
 /**

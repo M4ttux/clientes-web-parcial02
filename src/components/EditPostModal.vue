@@ -74,23 +74,17 @@ function cancel() {
         <!-- Campo de texto -->
         <div>
           <label class="block text-sm font-semibold mb-1">Contenido *</label>
-          <textarea
-            v-model="editContent"
-            rows="4"
+          <textarea v-model="editContent" rows="4"
             class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Escribí algo..."
-            required
-          ></textarea>
+            placeholder="Escribí algo..." required></textarea>
         </div>
 
         <!-- Imagen -->
         <div>
           <label class="block text-sm font-semibold mb-1">Imagen (opcional)</label>
 
-          <label
-            for="edit-imagen"
-            class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-600 inline-block"
-          >
+          <label for="edit-imagen"
+            class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-600 inline-block">
             Seleccionar Imagen
           </label>
           <input id="edit-imagen" type="file" accept="image/*" @change="handleFileChange" class="hidden" />
@@ -98,11 +92,7 @@ function cancel() {
           <p v-if="imagenError" class="text-red-400 text-xs mt-2">{{ imagenError }}</p>
 
           <div v-if="preview" class="mt-3 flex items-center gap-4">
-            <img
-              :src="preview"
-              alt="Vista previa"
-              class="w-24 h-24 rounded-lg border-2 border-gray-600 object-cover"
-            />
+            <img :src="preview" alt="Vista previa" class="w-24 h-24 rounded-lg border-2 border-gray-600 object-cover" />
             <button @click="eliminarImagen" type="button" class="text-red-400 hover:text-red-300 text-sm underline">
               Quitar imagen
             </button>

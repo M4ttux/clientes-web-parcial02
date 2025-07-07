@@ -1,4 +1,4 @@
-import supabase from './supabase';
+import supabase from "./supabase";
 
 /**
  * Retorna los últimos mensajes del chat, ordenados cronológicamente.
@@ -11,8 +11,9 @@ import supabase from './supabase';
  */
 export async function getLastMessages() {
   const { data, error } = await supabase
-    .from('global_chat')
-    .select(`
+    .from("global_chat")
+    .select(
+      `
       id,
       body,
       created_at,
@@ -22,12 +23,16 @@ export async function getLastMessages() {
         display_name,
         avatar_url
       )
-    `)
-    .order('created_at', { ascending: false })
+    `
+    )
+    .order("created_at", { ascending: false })
     .limit(10);
 
   if (error) {
-    console.error('[global-chat.js getLastMessages] Error al traer los mensajes: ', error);
+    console.error(
+      "[global-chat.js getLastMessages] Error al traer los mensajes: ",
+      error
+    );
     throw error;
   }
 
@@ -45,21 +50,22 @@ export async function getLastMessages() {
  * @returns {void}
  */
 export async function subscribeToGlobalChatNewMessages(callback) {
-  const chatChannel = supabase.channel('global_chat');
+  const chatChannel = supabase.channel("global_chat");
 
   chatChannel.on(
-    'postgres_changes',
+    "postgres_changes",
     {
-      schema: 'public',
-      table: 'global_chat',
-      event: 'INSERT',
+      schema: "public",
+      table: "global_chat",
+      event: "INSERT",
     },
     async (data) => {
       console.log("¡Nuevo mensaje insertado! ID:", data.new.id);
 
       const { data: fullMessage, error } = await supabase
-        .from('global_chat')
-        .select(`
+        .from("global_chat")
+        .select(
+          `
           id,
           body,
           created_at,
@@ -69,12 +75,16 @@ export async function subscribeToGlobalChatNewMessages(callback) {
             display_name,
             avatar_url
           )
-        `)
-        .eq('id', data.new.id)
+        `
+        )
+        .eq("id", data.new.id)
         .single();
 
       if (error) {
-        console.error('[global-chat.js] Error al obtener mensaje con perfil:', error);
+        console.error(
+          "[global-chat.js] Error al obtener mensaje con perfil:",
+          error
+        );
         return;
       }
 
@@ -94,9 +104,13 @@ export async function subscribeToGlobalChatNewMessages(callback) {
  * @throws {Error} Si ocurre un error al guardar el mensaje.
  * @returns {Promise<void>}
  */
-export async function saveGlobalChatMessage({ body, user_id, user_profile_id }) {
+export async function saveGlobalChatMessage({
+  body,
+  user_id,
+  user_profile_id,
+}) {
   const { error } = await supabase
-    .from('global_chat')
+    .from("global_chat")
     .insert({ body, user_id, user_profile_id });
 
   if (error) throw new Error(error.message);
@@ -114,19 +128,22 @@ export async function saveGlobalChatMessage({ body, user_id, user_profile_id }) 
  */
 export async function sendChatMessage({ body, user_id }) {
   const { data: profile, error: profileError } = await supabase
-    .from('user_profiles')
-    .select('id')
-    .eq('id', user_id)
+    .from("user_profiles")
+    .select("id")
+    .eq("id", user_id)
     .single();
 
   if (profileError || !profile) {
-    console.error("[global-chat.js sendChatMessage] No se encontró el perfil:", profileError);
+    console.error(
+      "[global-chat.js sendChatMessage] No se encontró el perfil:",
+      profileError
+    );
     throw new Error("No se pudo obtener el perfil del usuario.");
   }
 
   await saveGlobalChatMessage({
     body,
     user_id,
-    user_profile_id: profile.id
+    user_profile_id: profile.id,
   });
 }

@@ -8,7 +8,8 @@ import { getCurrentUser } from "./auth";
 export async function getAllPosts() {
   const { data, error } = await supabase
     .from("posts")
-    .select(`
+    .select(
+      `
       id,
       content,
       created_at,
@@ -29,21 +30,20 @@ export async function getAllPosts() {
           avatar_url
         )
       )
-    `)
-    .order("created_at", { ascending: false }) // solo ordenar publicaciones
+    `
+    )
+    .order("created_at", { ascending: false }); // solo ordenar publicaciones
 
   if (error) throw error;
 
   // ordenar los comentarios de cada post por fecha
-  return data.map(post => ({
+  return data.map((post) => ({
     ...post,
-    comments: post.comments?.slice().sort((a, b) =>
-      new Date(a.created_at) - new Date(b.created_at)
-    )
+    comments: post.comments
+      ?.slice()
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)),
   }));
 }
-
-
 
 /**
  * Trae todas las publicaciones de un usuario.
@@ -258,9 +258,9 @@ export async function updatePostContentWithImage(
 }
 
 /*
-* Extrae la ruta del storage desde una URL pública de Supabase.
-*
-*/
+ * Extrae la ruta del storage desde una URL pública de Supabase.
+ *
+ */
 
 function getStoragePathFromUrl(url) {
   try {
@@ -365,7 +365,6 @@ export function subscribeToNewPosts(callback) {
     )
     .subscribe();
 }
-
 
 /**
  * Suscripción en tiempo real a la tabla posts y comments.
