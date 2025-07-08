@@ -39,7 +39,7 @@ export default {
       }
 
       if (!this.user.career.trim()) {
-        this.errorMsg = "La carrera es obligatoria.";
+        this.errorMsg = "Los intereses son obligatorios.";
         return;
       }
 
@@ -87,7 +87,7 @@ export default {
       </div>
 
       <div>
-        <label for="career" class="block mb-1 text-sm text-gray-300">Carrera *</label>
+        <label for="career" class="block mb-1 text-sm text-gray-300">Intereses *</label>
         <input v-model="user.career" type="text" id="career"
           class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
       </div>

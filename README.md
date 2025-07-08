@@ -17,7 +17,7 @@ Social Media es una red social simple para la materia *Clientes Web Mobile*. Per
 ✅ Registro y autenticación de usuarios  
 ✅ Creación y visualización de publicaciones  
 ✅ Comentarios en publicaciones con actualizaciones en tiempo real  
-✅ Edición de perfil (nombre, bio, carrera, avatar, contraseña)  
+✅ Edición de perfil (nombre, bio, intereses, avatar, contraseña)  
 ✅ Visualización de perfiles de otros usuarios  
 ✅ Eliminación de publicaciones y comentarios propios  
 ✅ Chat global en tiempo real  

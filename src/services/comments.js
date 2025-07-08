@@ -116,3 +116,44 @@ export function subscribeToUserComments(userId, callback) {
     )
     .subscribe();
 }
+
+/**
+ * Suscribe a los cambios de comentarios de una publicación.
+ *
+ * @param {string} postId
+ */
+export const subscribeToCommentsRealtime = (postId, callback) => {
+  const channel = supabase
+    .channel(`comments:post_${postId}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'comments', filter: `post_id=eq.${postId}` },
+      (payload) => {
+        callback(payload.new)
+      }
+    )
+    .subscribe()
+
+  return channel
+}
+
+export async function getCommentsByPost(postId) {
+  const { data, error } = await supabase
+    .from('comments')
+    .select(`
+      id,
+      content,
+      created_at,
+      user_profiles (
+        id,
+        display_name,
+        avatar_url
+      )
+    `)
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true })
+
+  if (error) throw error
+  return data
+}
+

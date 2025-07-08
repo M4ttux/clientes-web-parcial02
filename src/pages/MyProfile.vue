@@ -1,6 +1,7 @@
 <script>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useEventBus } from '@vueuse/core'
 
 import MainH1 from '../components/MainH1.vue'
 import PostCard from '../components/PostCard.vue'
@@ -21,6 +22,7 @@ export default {
   },
 
   setup() {
+    const comentarioEliminadoBus = useEventBus('comentario-eliminado')
     const router = useRouter()
     const perfil = ref(null)
     const publicaciones = ref([])
@@ -31,6 +33,7 @@ export default {
     const tituloModal = ref('')
     const mensajeModal = ref('')
     const accionConfirmada = ref(null)
+
 
     const abrirModal = (titulo, mensaje, accion) => {
       tituloModal.value = titulo
@@ -87,12 +90,16 @@ export default {
           try {
             await deleteCommentById(id)
             comentarios.value = comentarios.value.filter(c => c.id !== id)
+
+            // emitir evento global
+            comentarioEliminadoBus.emit(id)
           } catch (e) {
             console.error('Error al eliminar comentario:', e)
           }
         }
       )
     }
+
 
     const irAEditarPerfil = () => {
       router.push({ name: 'MyProfileEdit' })
@@ -128,7 +135,7 @@ export default {
     })
 
     onUnmounted(() => {
-      if (canalComentarios) {
+      if (canalComentarios && typeof canalComentarios.unsubscribe === 'function') {
         canalComentarios.unsubscribe()
       }
     })
@@ -177,7 +184,7 @@ export default {
             Te uniste el {{ new Date(perfil.created_at).toLocaleDateString('es-AR') }}
           </p>
           <p class="mb-2"><strong>Biografía:</strong> {{ perfil.bio || 'Sin biografía' }}</p>
-          <p><strong>Carrera:</strong> {{ perfil.career || 'No especificada' }}</p>
+          <p><strong>Intereses:</strong> {{ perfil.career || 'No especificada' }}</p>
         </div>
 
         <!-- Publicaciones -->
@@ -185,7 +192,6 @@ export default {
           <h3 class="text-xl text-white font-semibold mb-3">Mis Publicaciones</h3>
           <PostCard v-for="post in publicaciones" :key="post.id" :post="post" :showDelete="true" :showEdit="true"
             :onDelete="eliminarPublicacion" :onEdit="handleEditarPost" />
-
           <p v-if="publicaciones.length === 0" class="text-gray-400">Todavía no publicaste nada.</p>
         </div>
 
@@ -197,9 +203,10 @@ export default {
               <img
                 :src="comment.user_profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_profiles?.display_name || '')}&background=4b5563&color=ffffff`"
                 alt="avatar" class="w-8 h-8 rounded-full border border-gray-500" />
-              <span class="font-semibold text-blue-300 text-sm">
+              <router-link :to="{ name: 'UserProfile', params: { id: comment.user_profiles?.id } }"
+                class="font-semibold text-blue-300 text-sm hover:underline">
                 {{ comment.user_profiles?.display_name || 'Anónimo' }}
-              </span>
+              </router-link>
               <span class="ml-auto text-xs text-gray-400">
                 {{ new Date(comment.created_at).toLocaleString('es-AR') }}
               </span>

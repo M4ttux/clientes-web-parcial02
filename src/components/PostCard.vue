@@ -1,5 +1,6 @@
 <script>
-import { ref } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
+import { useEventBus } from '@vueuse/core'
 import EditPostModal from './EditPostModal.vue'
 import PostComments from './PostComments.vue'
 
@@ -17,15 +18,39 @@ export default {
   },
   setup(props) {
     const showModal = ref(false)
+    const localComments = ref([...props.post.comments]) // ✅ comentarios locales reactivos
+
+    // Sincronizar si cambian externamente
+    watch(() => props.post.comments, (nuevos) => {
+      localComments.value = [...nuevos]
+    })
+
+    const bus = useEventBus('comentario-eliminado')
+
+    const handler = (deletedCommentId) => {
+      localComments.value = localComments.value.filter(c => c.id !== deletedCommentId)
+    }
+
+    bus.on(handler)
+
+    onUnmounted(() => {
+      bus.off(handler)
+    })
 
     const handleEditSubmit = (data) => {
       props.onEdit?.(data.id, data.content, data.image, data.removeImage)
       showModal.value = false
     }
 
+    const handleNewComment = (comment) => {
+      localComments.value.push(comment)
+    }
+
     return {
       showModal,
-      handleEditSubmit
+      handleEditSubmit,
+      localComments,
+      handleNewComment
     }
   },
   computed: {
@@ -65,7 +90,7 @@ export default {
     <!-- Imagen -->
     <div v-if="post.image_url" class="mb-4">
       <img :src="post.image_url" alt="Imagen del post"
-        class=" w-full max-w-[500px] mx-auto object-cover rounded-lg border border-gray-700 shadow-lg" />
+        class="w-full max-w-[500px] mx-auto object-cover rounded-lg border border-gray-700 shadow-lg" />
     </div>
 
     <!-- Botones de acción -->
@@ -81,8 +106,7 @@ export default {
     </div>
 
     <!-- Comentarios -->
-    <PostComments :post-id="post.id" :comments="post.comments" />
-
+    <PostComments :post-id="post.id" :comments="localComments" @new-comment="handleNewComment" />
 
     <!-- Modal -->
     <EditPostModal :visible="showModal" :post="post" @submit="handleEditSubmit" @close="showModal = false" />

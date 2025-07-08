@@ -136,7 +136,7 @@ export default {
           </div>
 
           <div>
-            <label for="carrera" class="block text-sm font-semibold mb-1">Carrera</label>
+            <label for="carrera" class="block text-sm font-semibold mb-1">Intereses</label>
             <input id="carrera" type="text" v-model="carrera"
               class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
